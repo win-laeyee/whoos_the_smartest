@@ -18,26 +18,27 @@ export default function Page() {
           <div className="card-body">
             <h2 className="card-title">Drag and drop files here</h2>
             <p>File type accepted: .mov, .mp4, .pdf, .pptx</p>
+
             <input
               type="file"
-              className="file-input w-full max-w-xs border-black"
+              className="file-input border-black flex-grow file-input-secondary"
             />
           </div>
         </div>
-        <div className="flex flex-col w-1/2">
+        <div className="flex flex-col w-1/2 justify-center">
           <input
             type="text"
             placeholder="Enter page numbers e.g. 2-5"
-            className="input input-bordered rounded-full border-black border-2 w-full max-w-xs my-2"
+            className="input input-bordered rounded-full border-black border-2 w-full my-2"
           />
-          <select className="select select-bordered rounded-full border-black border-2 w-full max-w-xs my-2">
+          <select className="select select-bordered rounded-full border-black border-2 w-full my-2">
             <option disabled selected>
               Note type
             </option>
             <option>Detailed</option>
             <option>Overview</option>
           </select>
-          <select className="select select-bordered rounded-full border-black border-2 w-full max-w-xs my-2">
+          <select className="select select-bordered rounded-full border-black border-2 w-full my-2">
             <option disabled selected>
               Learning style
             </option>

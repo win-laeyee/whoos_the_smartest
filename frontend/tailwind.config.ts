@@ -1,3 +1,4 @@
+import { Poppins } from "next/font/google";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -8,14 +9,37 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        poppins: ["var(--font-poppins)"],
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            h1: {
+              fontFamily: "Poppins, var(--font-poppins)", // Ensure the correct font is used
+              color: "#000",
+              fontSize: "32px",
+              fontWeight: "700",
+              lineHeight: "normal",
+            },
+            p: {
+              fontFamily: "Poppins, var(--font-poppins)", // Ensure the correct font is used
+              color: "#000",
+              fontSize: "20px",
+              fontWeight: "500",
+              lineHeight: "normal",
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [require("daisyui")],
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
   daisyui: {
     themes: [
       {

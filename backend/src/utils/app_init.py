@@ -5,13 +5,17 @@ import google.generativeai as genai
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 
-def init_gemini_llm():
+def configure_genai():
     with open('backend/secrets/google_gemini_credentials.json') as f:
         secrets = json.load(f)
 
     GOOGLE_API_KEY=secrets['GOOGLE_API_KEY']
     genai.configure(api_key=GOOGLE_API_KEY)
 
+
+def init_gemini_llm():
+    configure_genai()
+    
     model = genai.GenerativeModel('gemini-1.5-pro')
     return model
 

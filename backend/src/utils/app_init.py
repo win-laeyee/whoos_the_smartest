@@ -1,11 +1,13 @@
 import json
 import logging
 import google.generativeai as genai
+from google.generativeai import GenerativeModel
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 
-
-def configure_genai():
+def configure_genai() -> None:
+    """
+    Configures the Google Generative AI API with the API key.
+    """
     with open('backend/secrets/google_gemini_credentials.json') as f:
         secrets = json.load(f)
 
@@ -13,7 +15,10 @@ def configure_genai():
     genai.configure(api_key=GOOGLE_API_KEY)
 
 
-def init_gemini_llm():
+def init_gemini_llm() -> GenerativeModel:
+    """
+    Initializes and returns a GenerativeModel instance from the Google Generative AI API.
+    """
     configure_genai()
     
     model = genai.GenerativeModel('gemini-1.5-pro')
@@ -21,8 +26,10 @@ def init_gemini_llm():
 
 
 
-
-def configure_logging(log_level: int = logging.INFO):
+def configure_logging(log_level: int = logging.INFO) -> None:
+    """
+    Configures the logging settings for the application.
+    """
     logging.getLogger().handlers.clear()
 
     logging.basicConfig(

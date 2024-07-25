@@ -1,6 +1,7 @@
 import os
 
 from google.generativeai.types import File
+from google.generativeai import GenerativeModel
 
 from backend.src.utils.app_init import init_gemini_llm
 from backend.src.utils.file_check import check_file_type
@@ -11,7 +12,20 @@ from backend.src.utils.file_upload import upload_file
 from backend.src.utils.text_extraction import extract_text
 
 
-def generate_notes(file_path: str):
+def generate_notes(file_path: str) -> str:
+    """
+    Generates notes from a file based on its type. Handles media and document files.
+
+    Args:
+        file_path (str): The path to the file from which to generate notes.
+
+    Returns:
+        str: The generated notes.
+
+    Raises:
+        FileNotFoundError: If the file does not exist at the given path.
+        ValueError: If the file type is unsupported.
+    """
     model = init_gemini_llm()
 
     if not os.path.exists(file_path):
@@ -30,7 +44,17 @@ def generate_notes(file_path: str):
     return notes
    
 
-def get_notes_from_media(media_file: File, model) -> str:
+def get_notes_from_media(media_file: File, model: GenerativeModel) -> str:
+    """
+    Generates notes from a media file using a generative model.
+
+    Args:
+        media_file (File): The media file object.
+        model: The generative model to use for generating notes.
+
+    Returns:
+        str: The generated notes.
+    """
     prompt = "Generate a summary of notes from the media file provided."
     response = model.generate_content([media_file, prompt],
                                 request_options={"timeout": 600})
@@ -43,7 +67,17 @@ def get_notes_from_media(media_file: File, model) -> str:
 
 
 
-def get_notes_from_document(extracted_text: str, model) -> str:
+def get_notes_from_document(extracted_text: str, model: GenerativeModel) -> str:
+    """
+    Generates notes from extracted text using a generative model.
+
+    Args:
+        extracted_text (str): The text extracted from a document.
+        model: The generative model to use for generating notes.
+
+    Returns:
+        str: The generated notes.
+    """
     prompt = f"Here is the extracted text: \n{extracted_text}\n\nPlease generate a summary or content based on this text."
 
     response = model.generate_content(prompt)

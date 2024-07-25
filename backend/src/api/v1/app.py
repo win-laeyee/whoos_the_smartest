@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from backend.src.utils.app_init import configure_genai, init_gemini_llm
-from backend.src.utils.generation import generate_notes
+from backend.src.utils.app_init import configure_genai
+from backend.src.utils.notes_generation import generate_notes
 from backend.src.api.v1.models.requests import SampleRequest
 from backend.src.api.v1.models.responses import SampleResponse
 

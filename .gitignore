@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 **/node_modules
 **/.pnp
@@ -37,5 +35,12 @@ next-env.d.ts
 # virtual env
 venv/
 
+# secrets
+backend/secrets/
+
 # pycache folders
-src/api/__pycache__/
+__pycache__/
+
+
+# data
+backend/data

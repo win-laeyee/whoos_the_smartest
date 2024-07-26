@@ -1,0 +1,117 @@
+import time, logging
+
+from typing import Any, Dict
+import google.generativeai as genai
+from google.generativeai.types import File
+from moviepy.editor import VideoFileClip
+from backend.src.utils.constants import IMAGE, VIDEO
+
+
+def get_video_metadata(video_path: str) -> Dict[str, Any]:
+    """
+    Retrieves metadata from a video file.
+
+    Args:
+        video_path (str): The path to the video file.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing video metadata such as duration, width, height, and fps.
+
+    Raises:
+        Exception: If an error occurs while processing the video file.
+    """
+    try:
+        clip = VideoFileClip(video_path)
+        video_metadata = {
+            'duration': clip.duration,
+            'width': clip.w,
+            'height': clip.h,
+            'fps': clip.fps
+        }
+        return video_metadata
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {}
+
+
+def upload_video_file(video_path: str) -> File:
+    """
+    Uploads a video file to Google Generative AI storage and waits for processing to complete.
+
+    Args:
+        video_path (str): The path to the video file.
+
+    Returns:
+        File: The uploaded video file object.
+
+    Raises:
+        ValueError: If the video file is too long or if the upload fails.
+    """
+
+    video_metadata = get_video_metadata(video_path)
+    logging.info(f"metadata: {video_metadata}")
+
+    if video_metadata['duration'] >= 7200:
+        logging.info(f"Duration of the video is {video_metadata['duration']}")
+        raise ValueError("Video file is too long. Make sure it does not exceed 2 hours.")
+
+    video_file_name = video_path
+    logging.info(f"Uploading file...")
+    video_file = genai.upload_file(path=video_file_name)
+    logging.info(f"Completed upload: {video_file}")
+    print(f"Completed upload: {video_file}")
+
+    while video_file.state.name == "PROCESSING":
+        print('.', end='')
+        time.sleep(10)
+        video_file = genai.get_file(video_file.name)
+
+    if video_file.state.name == "FAILED":
+        raise ValueError(video_file.state.name)
+
+    return video_file
+
+
+def upload_image_file(image_path: str) -> File:
+    """
+    Uploads an image file to Google Generative AI storage.
+
+    Args:
+        image_path (str): The path to the image file.
+
+    Returns:
+        File: The uploaded image file object.
+    
+    Raises:
+        Exception: If the upload fails.
+    """
+    try:
+        image_file = genai.upload_file(path=image_path)
+        logging.info(f"Completed upload: {image_file}")
+        print(f"Completed upload: {image_file}")
+    except Exception as e:
+        raise Exception(f"Error occurred: {e}")
+
+    return image_file
+
+
+def upload_file(file_path: str, file_type: str) -> File:
+    """
+    Uploads a file to Google Generative AI storage based on its type.
+
+    Args:
+        file_path (str): The path to the file.
+        file_type (str): The type of the file, such as 'VIDEO' or 'IMAGE'.
+
+    Returns:
+        File: The uploaded file object.
+
+    Raises:
+        ValueError: If the file type is unsupported.
+    """
+    if file_type == VIDEO:
+        return upload_video_file(file_path)
+    elif file_type == IMAGE:
+        return upload_image_file(file_path)
+    else:
+        raise ValueError(f"Unsupported file type: {file_type}")

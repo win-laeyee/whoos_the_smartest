@@ -5,7 +5,6 @@ from firebase_admin import firestore
 import google.generativeai as genai
 from google.cloud.firestore_v1.vector import Vector
 from google.cloud.firestore_v1.base_vector_query import DistanceMeasure
-from google.cloud.firestore_v1.base_document import DocumentSnapshot
 
 from langchain_experimental.text_splitter import SemanticChunker
 
@@ -19,7 +18,7 @@ def add_to_notes(db, user_id, notes):
     for note_doc in notes_split:
         note = note_doc.page_content
         note_embeddings = embed_text(note)
-        notes = {"summarised_notes": note, "embedding": note_embeddings}
+        notes = {"summarised_notes": note, "embedding": note_embeddings, "timestamp": firestore.SERVER_TIMESTAMP}
         update_time, note_ref = db.collection(USER_COLLECTION).document(user_id).collection(NOTE_COLLECTION).add(notes)
         logging.info(f'Added document with id {note_ref.id} at {update_time}')
 

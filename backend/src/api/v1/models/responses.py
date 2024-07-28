@@ -1,4 +1,21 @@
 from pydantic import BaseModel
 
-class SampleResponse(BaseModel):
-    random_string: str
+class NotesGenerateResponse(BaseModel):
+    summarised_notes: str
+
+
+class UserSignupResponse(BaseModel):
+    message: str
+
+class WelcomeResponse(BaseModel):
+    message: str
+
+class UserLoginResponse(BaseModel):
+    message: str
+    idToken: str
+
+class DeleteMediaResponse(BaseModel):
+    message: str
+
+class DeleteCollectionsResponse(BaseModel):
+    message: str

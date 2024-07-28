@@ -3,8 +3,12 @@ from firebase_admin import credentials
 import pyrebase
 import json
 
+from pyrebase.pyrebase import Firebase
 
-def initialize_firebase():
+def initialize_firebase() -> Firebase:
+    """
+    Initializes Firebase with the provided service account and SDK configurations.
+    """
     if not firebase_admin._apps:
         cred = credentials.Certificate("backend/secrets/firebase_service_account_key.json")
         firebase_admin.initialize_app(cred)

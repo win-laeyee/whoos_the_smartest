@@ -81,13 +81,4 @@ def get_notes_from_document(extracted_text: str, model: GenerativeModel) -> str:
     prompt = f"Here is the extracted text: \n{extracted_text}\n\nPlease generate a summary or content based on this text."
 
     response = model.generate_content(prompt)
-    print(f"get notes from doc: {response}")
     return response.text
-
-
-
-
-
-
-
-

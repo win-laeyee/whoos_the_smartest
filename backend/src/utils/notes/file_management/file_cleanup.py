@@ -1,8 +1,7 @@
+import logging
+
 import google.generativeai as genai
 from google.generativeai.types import File
-
-
-import logging
 
 
 def cleanup_file(file: File) -> None:

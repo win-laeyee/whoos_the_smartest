@@ -1,16 +1,30 @@
 import logging
 import textwrap
+from typing import Dict, List, Any, Union
 
 from google.generativeai import GenerativeModel
+from google.cloud.firestore_v1.client import Client
 
 from backend.src.api.v1.models.requests import QuizCustomisationRequest
-from backend.src.api.v1.models.responses import FreeResponseQuestion, MultiSelectQuestion, MultipleChoiceQuestion, TrueFalseChoices, TrueFalseQuestion
+from backend.src.api.v1.models.responses import FreeResponseQuestion, MultiSelectQuestion, MultipleChoiceQuestion, TrueFalseChoices, TrueFalseQuestion, StudentQuizEvaluationResponse
 from backend.src.utils.constants import NOTE_COLLECTION, QUIZ_FORMATTER
 from backend.src.utils.firestore.notes_operations import retrieve_notes_doc_from_firestore
 from backend.src.utils.json_utils import load_json_response
 
 
-def check_and_format_question_answer_list(quiz_qn_and_ans_dict):
+def check_and_format_question_answer_list(quiz_qn_and_ans_dict: Dict[str, List[Dict[str, Any]]]) -> List[Union[MultipleChoiceQuestion, MultiSelectQuestion, TrueFalseQuestion, FreeResponseQuestion]]:
+    """
+    Validates and formats a list of question and answer dictionaries.
+
+    Args:
+        quiz_qn_and_ans_dict (Dict[str, List[Dict[str, Any]]]): The dictionary containing the list of questions and answers.
+
+    Returns:
+        List[Union[MultipleChoiceQuestion, MultiSelectQuestion, TrueFalseQuestion, FreeResponseQuestion]]: A list of validated and formatted question objects.
+
+    Raises:
+        ValueError: If the input dictionary is missing required keys.
+    """
     if 'question_answer_list' not in quiz_qn_and_ans_dict:
             raise ValueError(f"Missing 'question_answer_list' key in: {quiz_qn_and_ans_dict}")
 
@@ -45,7 +59,16 @@ def check_and_format_question_answer_list(quiz_qn_and_ans_dict):
     return valid_questions_and_answers
 
 
-def get_quiz_customisation_params(quiz_customisation: QuizCustomisationRequest) -> dict:
+def get_quiz_customisation_params(quiz_customisation: QuizCustomisationRequest) -> Dict[str, Union[str, int]]:
+    """
+    Retrieves quiz customization parameters from a request object.
+
+    Args:
+        quiz_customisation (QuizCustomisationRequest): The request object containing customization options.
+
+    Returns:
+        Dict[str, Union[str, int]]: A dictionary of quiz customization parameters.
+    """
     return {
         'number_of_questions': quiz_customisation.number_of_questions or 10,
         'question_types': ', '.join(quiz_customisation.question_types) if quiz_customisation.question_types else "multiple_choice, multi_select, true_false, fill_in_the_blank, short_answer, long_answer",
@@ -56,14 +79,26 @@ def get_quiz_customisation_params(quiz_customisation: QuizCustomisationRequest) 
     }
 
 
-def get_quiz_from_content(content, model: GenerativeModel, number_of_questions: int, question_types: str, difficulty_level: str, include_explanation: str, emphasis: str, language: str):
+def get_quiz_from_content(content: str, 
+                          model: GenerativeModel, 
+                          number_of_questions: int, 
+                          question_types: str, 
+                          difficulty_level: str, 
+                          include_explanation: str, 
+                          emphasis: str, 
+                          language: str) -> str:
     """
-    Generates quiz questions based on the provided content and customisation options.
+    Generates quiz questions based on the provided content and customization options.
 
     Args:
         content (str): The text content to generate quiz questions from.
-        model: The generative model to use for generating quiz questions.
-        customisation (QuizCustomisationRequest): Customisation options for generating the quiz.
+        model (GenerativeModel): The generative model to use for generating quiz questions.
+        number_of_questions (int): The number of questions to generate.
+        question_types (str): The types of questions to generate.
+        difficulty_level (str): The difficulty level of the questions.
+        include_explanation (str): Whether to include explanations for the answers.
+        emphasis (str): The emphasis for the quiz questions.
+        language (str): The preferred language for the quiz.
 
     Returns:
         str: The generated quiz in JSON format.
@@ -84,7 +119,19 @@ def get_quiz_from_content(content, model: GenerativeModel, number_of_questions: 
     return response.text
 
 
-def generate_quiz(model: GenerativeModel, db, user_id, quiz_customisation: QuizCustomisationRequest):
+def generate_quiz(model: GenerativeModel, db: Client, user_id: str, quiz_customisation: QuizCustomisationRequest) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Generates a quiz based on the user's notes and customization options.
+
+    Args:
+        model (GenerativeModel): The generative model to use for generating quiz questions.
+        db (Client): The Firestore client.
+        user_id (str): The ID of the user.
+        quiz_customisation (QuizCustomisationRequest): Customization options for generating the quiz.
+
+    Returns:
+        Dict[str, List[Dict[str, Any]]]: The generated quiz in dictionary format.
+    """
 
     content = retrieve_notes_doc_from_firestore(db, user_id)
     logging.info(f"Retrieved documents from {NOTE_COLLECTION}")
@@ -99,7 +146,17 @@ def generate_quiz(model: GenerativeModel, db, user_id, quiz_customisation: QuizC
     return quiz_qn_and_ans_dict
 
 
-def format_strengths_weaknesses_for_quiz_regeneration(content: str, strengths_weaknesses) -> str:
+def format_strengths_weaknesses_for_quiz_regeneration(content: str, strengths_weaknesses: StudentQuizEvaluationResponse) -> str:
+    """
+    Formats the content and student's strengths and weaknesses for quiz regeneration.
+
+    Args:
+        content (str): The text content to generate quiz questions from.
+        strengths_weaknesses (StudentQuizEvaluationResponse): The student's strengths and weaknesses.
+
+    Returns:
+        str: The formatted string for quiz regeneration.
+    """
     formatted_str = content + "\n\n"
 
     strengths = strengths_weaknesses.strength
@@ -114,7 +171,33 @@ def format_strengths_weaknesses_for_quiz_regeneration(content: str, strengths_we
     return formatted_str
 
 
-def get_quiz_from_content_and_student_evaluation(content: str, model: GenerativeModel, number_of_questions: int, question_types: str, difficulty_level: str, include_explanation: str, emphasis: str, language: str, strength_weakness):
+def get_quiz_from_content_and_student_evaluation(content: str, 
+                                                 model: GenerativeModel, 
+                                                 number_of_questions: int, 
+                                                 question_types: str, 
+                                                 difficulty_level: str, 
+                                                 include_explanation: str, 
+                                                 emphasis: str, 
+                                                 language: str, 
+                                                 strength_weakness: StudentQuizEvaluationResponse) -> str:
+    """
+    Generates quiz questions based on the content and student's evaluation.
+
+    Args:
+        content (str): The text content to generate quiz questions from.
+        model (GenerativeModel): The generative model to use for generating quiz questions.
+        number_of_questions (int): The number of questions to generate.
+        question_types (str): The types of questions to generate.
+        difficulty_level (str): The difficulty level of the questions.
+        include_explanation (str): Whether to include explanations for the answers.
+        emphasis (str): The emphasis for the quiz questions.
+        language (str): The preferred language for the quiz.
+        strength_weakness (StudentQuizEvaluationResponse): The student's strengths and weaknesses.
+
+    Returns:
+        str: The generated quiz in JSON format.
+    """
+
     prompt = f"""
     Please generate {number_of_questions} quiz questions and answers based on this text and the student's assessment. 
     The question types should include: {question_types}. Choose the most appropriate questions based on the content and assessment of the student's strengths and weaknesses. You should focus more on the weakness.
@@ -132,7 +215,25 @@ def get_quiz_from_content_and_student_evaluation(content: str, model: Generative
     return response.text
 
 
-def regenerate_quiz_based_on_evaluation(model: GenerativeModel, db, user_id, quiz_customisation: QuizCustomisationRequest, strength_weakness):
+def regenerate_quiz_based_on_evaluation(model: GenerativeModel, 
+                                        db: Client, 
+                                        user_id: str, 
+                                        quiz_customisation: QuizCustomisationRequest, 
+                                        strength_weakness: StudentQuizEvaluationResponse) -> Dict[str, List[Dict[str, Any]]]:
+
+    """
+    Regenerates a quiz based on the student's evaluation and customization options.
+
+    Args:
+        model (GenerativeModel): The generative model to use for generating quiz questions.
+        db (Client): The Firestore client.
+        user_id (str): The ID of the user.
+        quiz_customisation (QuizCustomisationRequest): Customization options for generating the quiz.
+        strength_weakness (StudentQuizEvaluationResponse): The student's strengths and weaknesses.
+
+    Returns:
+        Dict[str, List[Dict[str, Any]]]: The regenerated list of questions and answers in dictionary format.
+    """
 
     content = retrieve_notes_doc_from_firestore(db, user_id)
     logging.info(f"Retrieved documents from {NOTE_COLLECTION}")

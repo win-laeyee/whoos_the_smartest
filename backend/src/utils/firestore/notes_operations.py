@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 import logging
 
 from firebase_admin import firestore
+from google.cloud.firestore_v1.client import Client
 
 from backend.src.utils.rag import chunk_text
 from backend.src.utils.constants import NOTE_COLLECTION, USER_COLLECTION
@@ -10,12 +11,12 @@ from backend.src.utils.rag import embed_text
 
 
 
-def add_to_notes(db: firestore.Client, user_id: str, notes: str) -> None:
+def add_to_notes(db: Client, user_id: str, notes: str) -> None:
     """
     Adds chunked and embedded notes to the Firestore database for a specified user.
 
     Args:
-        db (firestore.Client): The Firestore client.
+        db (Client): The Firestore client.
         user_id (str): The ID of the user.
         notes (str): The notes to be chunked and added.
     """
@@ -31,7 +32,16 @@ def add_to_notes(db: firestore.Client, user_id: str, notes: str) -> None:
         logging.info(f'Added document with id {note_ref.id} at {update_time}')
 
 
-def get_notes_from_docs(documents: List[Dict[str, Any]]):
+def get_notes_from_docs(documents: List[Dict[str, Any]]) -> str:
+    """
+    Aggregates 'summarised_notes' from a list of Firestore document dictionaries into a single string.
+
+    Args:
+        documents (List[Dict[str, Any]]): A list of document dictionaries, where each dictionary contains a 'summarised_notes' field.
+
+    Returns:
+        str: A concatenated string of all 'summarised_notes' from the documents.
+    """
     content = ""
 
     for doc in documents:
@@ -40,7 +50,20 @@ def get_notes_from_docs(documents: List[Dict[str, Any]]):
     return content
 
 
-def retrieve_notes_doc_from_firestore(db, user_id):
+def retrieve_notes_doc_from_firestore(db: Client, user_id: str) -> str:
+    """
+    Retrieves and aggregates notes from recent documents or all documents if recent ones are empty.
+
+    Args:
+        db (Client): The Firestore client.
+        user_id (str): The ID of the user.
+
+    Returns:
+        str: Aggregated notes content.
+
+    Raises:
+        ValueError: If no documents are found in the collection.
+    """
     recent_documents = get_recent_documents(db, user_id, NOTE_COLLECTION)
     content = get_notes_from_docs(recent_documents)
 

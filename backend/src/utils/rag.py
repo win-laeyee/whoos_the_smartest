@@ -6,6 +6,7 @@ from firebase_admin import firestore
 from google.cloud.firestore_v1.base_vector_query import DistanceMeasure
 import google.generativeai as genai
 from google.cloud.firestore_v1.vector import Vector
+from google.cloud.firestore_v1.client import Client
 
 from langchain.schema import Document
 from langchain_experimental.text_splitter import SemanticChunker
@@ -33,12 +34,12 @@ def embed_text(text: str) -> Vector:
     return vector_embeddings
 
 
-def similarity_search_in_notes(db: firestore.Client, user_id: str, embeddings: Vector, limit: Optional[int] = 5) -> List[str]:
+def similarity_search_in_notes(db: Client, user_id: str, embeddings: Vector, limit: Optional[int] = 5) -> List[str]:
     """
     Performs a similarity search in the user's notes collection using the provided embeddings.
 
     Args:
-        db (firestore.Client): The Firestore client.
+        db (Client): The Firestore client.
         user_id (str): The ID of the user.
         embeddings (Vector): The query embeddings.
         limit (Optional[int]): The maximum number of similar texts to retrieve. Defaults to 5.
@@ -66,12 +67,12 @@ def similarity_search_in_notes(db: firestore.Client, user_id: str, embeddings: V
     return retrieved_text_lst
 
 
-def get_most_similar_text(db: firestore.Client, user_id: str, query: str, limit: Optional[int] = 5) -> List[str]:
+def get_most_similar_text(db: Client, user_id: str, query: str, limit: Optional[int] = 5) -> List[str]:
     """
     Finds the most similar text in the user's notes based on a query.
 
     Args:
-        db (firestore.Client): The Firestore client.
+        db (Client): The Firestore client.
         user_id (str): The ID of the user.
         query (str): The query text.
         limit (Optional[int]): The maximum number of similar texts to retrieve. Defaults to 5.

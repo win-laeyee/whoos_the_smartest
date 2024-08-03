@@ -13,14 +13,14 @@ from backend.src.utils.notes.file_management.file_upload import upload_file
 from backend.src.utils.notes.text_extraction import extract_text
 
 
-def generate_notes_from_content(content: Union[str, File], model: GenerativeModel, customisation: dict, content_type: str) -> str:
+def generate_notes_from_content(content: Union[str, File], model: GenerativeModel, customisation: Dict[str, str], content_type: str) -> str:
     """
     Generates notes from provided content (media or document) using a generative model.
 
     Args:
         content (Union[str, File]): A media file or document to generate notes from.
-        model: The generative model to use for generating notes.
-        customisation (dict): The customisation settings.
+        model (GenerativeModel): The generative model to use for generating notes.
+        customisation (Dict[str, str]): The customisation settings.
         content_type (str): The type of content ('media' or 'document').
 
     Returns:
@@ -47,15 +47,15 @@ def generate_notes_from_content(content: Union[str, File], model: GenerativeMode
     return response.text
 
 
-def get_notes_customisation_params(notes_customisation: NotesCustomisationRequest) -> Dict[str, Any]:
+def get_notes_customisation_params(notes_customisation: NotesCustomisationRequest) -> Dict[str, str]:
     """
-    Returns the actual customisation settings based on the user's preferences.
+    Returns the actual notes customisation settings based on the user's preferences.
 
     Args:
-        customisation (NotesCustomisationRequest): The customisation options.
+        notes_customisation (NotesCustomisationRequest): The customisation options.
 
     Returns:
-        Dict[str, Any]: The actual customisation settings.
+        Dict[str, str]: The actual customisation settings.
     """
     return {
         'focus': notes_customisation.focus_custom if notes_customisation.focus == 'other' else notes_customisation.focus,
@@ -71,7 +71,9 @@ def generate_notes(model: GenerativeModel, file_path: str, notes_customisation: 
     Generates notes from a file based on its type. Handles media and document files.
 
     Args:
+        model (GenerativeModel): The generative model to use for generating notes.
         file_path (str): The path to the file from which to generate notes.
+        notes_customisation (NotesCustomisationRequest): The customisation options.
 
     Returns:
         str: The generated notes.

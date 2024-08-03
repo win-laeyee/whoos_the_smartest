@@ -1,3 +1,4 @@
+# File types
 PDF_DOCUMENT = "PDF"
 WORD_DOCUMENT = "WORD"
 IMAGE = "IMAGE"
@@ -5,11 +6,13 @@ VIDEO = "VIDEO"
 PPT_SLIDE = "PRESENTATION_SLIDES"
 
 
+# Collection names
 USER_COLLECTION = 'users'
 NOTE_COLLECTION = 'notes'
 QUIZ_COLLECTION = 'quiz_qn_and_ans'
 
 
+# Prompts
 QUIZ_FORMATTER = """Please return JSON describing the question and answer from this text using the following schema:
 
     {"question_answer_list": list[MultipleChoice, MultiSelect, TrueFalse, FillInTheBlank, ShortAnswer, LongAnswer]}

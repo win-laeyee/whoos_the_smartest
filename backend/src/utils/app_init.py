@@ -2,6 +2,7 @@ import json
 import logging
 import google.generativeai as genai
 from google.generativeai import GenerativeModel
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 
 def configure_genai() -> None:
@@ -13,6 +14,7 @@ def configure_genai() -> None:
 
     GOOGLE_API_KEY=secrets['GOOGLE_API_KEY']
     genai.configure(api_key=GOOGLE_API_KEY)
+    return GOOGLE_API_KEY
 
 
 def init_gemini_llm() -> GenerativeModel:
@@ -24,6 +26,14 @@ def init_gemini_llm() -> GenerativeModel:
     model = genai.GenerativeModel('gemini-1.5-pro')
     return model
 
+
+def init_embedding_model() -> GoogleGenerativeAIEmbeddings:
+    """
+    Initializes and returns a GoogleGenerativeAIEmbeddings instance.
+    """
+    GOOGLE_API_KEY = configure_genai()
+    embedding_model = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=GOOGLE_API_KEY)
+    return embedding_model
 
 
 def configure_logging(log_level: int = logging.INFO) -> None:

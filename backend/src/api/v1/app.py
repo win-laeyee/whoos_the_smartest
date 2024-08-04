@@ -4,12 +4,19 @@ from fastapi import FastAPI, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.exceptions import HTTPException
 
-from backend.src.utils.app_init import configure_genai
-from backend.src.utils.notes_generation import generate_notes
-from backend.src.api.v1.models.requests import FilePathRequest, UserLoginRequest, UserSignupRequest, DeleteMediaRequest, DeleteCollectionsRequest
-from backend.src.api.v1.models.responses import NotesGenerateResponse, UserSignupResponse, UserLoginResponse, WelcomeResponse, DeleteMediaResponse, DeleteCollectionsResponse
-from backend.src.firebase.firebase_init import initialize_firebase
-from backend.src.firebase.database import add_to_notes, delete_firestore_collection
+from backend.src.utils.app_init import configure_genai, init_gemini_llm
+from backend.src.utils.firestore.notes_operations import add_to_notes
+from backend.src.utils.firestore.quizzes_operations import add_student_answer_to_quizzes, add_to_quizzes
+from backend.src.utils.notes.notes_generation import generate_notes
+from backend.src.utils.quiz.quiz_generation import check_and_format_question_answer_list, generate_quiz
+from backend.src.utils.quiz.quiz_generation import regenerate_quiz_based_on_evaluation
+from backend.src.utils.quiz.quiz_correctness import check_student_answer
+from backend.src.utils.quiz.strength_and_weakness import assess_student_strength_weakness
+from backend.src.utils.query_bot import query_firestore
+from backend.src.api.v1.models.requests import FilePathRequest, UserLoginRequest, UserSignupRequest, DeleteMediaRequest, DeleteCollectionsRequest, CompareAnswerRequest, NotesCustomisationRequest, QuizCustomisationRequest, QueryBotRequest, QuizParameterRequest
+from backend.src.api.v1.models.responses import NotesGenerateResponse, UserSignupResponse, UserLoginResponse, WelcomeResponse, DeleteMediaResponse, DeleteCollectionsResponse, QuizGenerateResponse, EvaluateQuizResponse, StudentQuizEvaluationResponse, QueryBotResponse
+from backend.src.utils.app_init import initialize_firebase
+from backend.src.utils.firestore.document_operations import delete_all_docs_in_collection
 
 import google.generativeai as genai
 
@@ -20,6 +27,8 @@ app = FastAPI()
 security = HTTPBearer()
 firebase = initialize_firebase()
 db = firestore.client()
+
+model = init_gemini_llm()
 
 @app.get("/")
 def healthcheck():
@@ -76,14 +85,86 @@ async def protected_route(user=Depends(verify_token)):
 @app.post("/api/get-notes-from-uploaded-file", response_model=NotesGenerateResponse)
 def get_notes_from_uploaded_file(
     file: FilePathRequest,
+    notes_customisation: NotesCustomisationRequest,
     user=Depends(verify_token)
 ):
     
-    notes = generate_notes(file.file_path)
+    notes = generate_notes(model, file.file_path, notes_customisation)
     user_id = user['uid']
     add_to_notes(db, user_id, notes)
 
     return NotesGenerateResponse(summarised_notes=notes)
+
+
+@app.post("/api/get-quiz-from-uploaded-notes", response_model=QuizGenerateResponse)
+def get_quiz_from_uploaded_notes(
+    quiz_customisation: QuizCustomisationRequest,
+    user=Depends(verify_token)
+):
+    user_id = user['uid']
+    
+    quiz_qn_and_ans_dict = generate_quiz(model, db, user_id, quiz_customisation)
+    formatted_quiz_qn_and_ans = check_and_format_question_answer_list(quiz_qn_and_ans_dict)
+
+    add_to_quizzes(db, user_id, quiz_qn_and_ans_dict)
+
+    return QuizGenerateResponse(questions_and_answers=formatted_quiz_qn_and_ans)
+
+
+@app.post("/api/evaluate-student-answer", response_model=EvaluateQuizResponse)
+def evaluate_student_answer(
+    question_and_answers: CompareAnswerRequest,
+    user=Depends(verify_token)
+):
+    user_id = user['uid']
+    question_and_answer = question_and_answers.question_and_answer
+    student_answer = question_and_answers.student_answer
+    
+    correctness = check_student_answer(model, question_and_answer, student_answer)
+
+    add_student_answer_to_quizzes(db, user_id, question_and_answer.question, student_answer, correctness)
+
+    return EvaluateQuizResponse(correctness=correctness)
+
+
+
+@app.post("/api/get-student-strength-weakness", response_model=StudentQuizEvaluationResponse)
+def get_student_strength_and_weakness(
+    quiz_parameter: QuizParameterRequest,
+    user=Depends(verify_token)
+):
+    user_id = user['uid']
+    
+    result_dict = assess_student_strength_weakness(model, db, user_id, quiz_parameter.num_of_qns)
+
+    return StudentQuizEvaluationResponse(score=result_dict["score"],strength=result_dict["strength"], weakness=result_dict["weakness"])
+
+
+@app.post("/api/regenerate-quiz", response_model=QuizGenerateResponse)
+def regenerate_quiz(
+    quiz_customisation: QuizCustomisationRequest,
+    strength_and_weakness: StudentQuizEvaluationResponse,
+    user=Depends(verify_token)
+):
+    user_id = user['uid']
+    
+    quiz_qn_and_ans_dict = regenerate_quiz_based_on_evaluation(model, db, user_id, quiz_customisation, strength_and_weakness)
+    formatted_quiz_qn_and_ans = check_and_format_question_answer_list(quiz_qn_and_ans_dict)
+    
+    add_to_quizzes(db, user_id, quiz_qn_and_ans_dict)
+
+    return QuizGenerateResponse(questions_and_answers=formatted_quiz_qn_and_ans)
+
+
+@app.post("/api/query-bot", response_model=QueryBotResponse)
+def query_bot(
+    user_query: QueryBotRequest,
+    user=Depends(verify_token)
+):
+    user_id = user['uid']
+    bot_answer = query_firestore(db, user_id, model, user_query.query, limit=10)
+
+    return QueryBotResponse(answer=bot_answer)
 
 
 @app.post("/api/delete-media")
@@ -104,7 +185,7 @@ def delete_collections(
     coll_name = coll_info.coll_name
     batch_size = coll_info.batch_size
     
-    delete_firestore_collection(db, coll_name, batch_size, user_id)
+    delete_all_docs_in_collection(db, coll_name, batch_size, user_id)
 
     return DeleteCollectionsResponse(message=f"Deleted '{coll_name}' collection")
 

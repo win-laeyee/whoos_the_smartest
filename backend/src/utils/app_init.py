@@ -1,8 +1,14 @@
 import json
 import logging
+
 import google.generativeai as genai
 from google.generativeai import GenerativeModel
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+import firebase_admin
+from firebase_admin import credentials
+import pyrebase
+from pyrebase.pyrebase import Firebase
 
 
 def configure_genai() -> None:
@@ -52,4 +58,20 @@ def configure_logging(log_level: int = logging.INFO) -> None:
     logging.getLogger("uvicorn.error").handlers.clear()
     logging.getLogger("uvicorn.access").propagate = True
     logging.getLogger("uvicorn.error").propagate = True
+
+
+def initialize_firebase() -> Firebase:
+    """
+    Initializes Firebase with the provided service account and SDK configurations.
+    """
+    if not firebase_admin._apps:
+        cred = credentials.Certificate("backend/secrets/firebase_service_account_key.json")
+        firebase_admin.initialize_app(cred)
+
+    with open('backend/secrets/firebase_sdk.json') as f:
+        firebase_config = json.load(f)
+
+    firebase = pyrebase.initialize_app(firebase_config)
+
+    return firebase
 

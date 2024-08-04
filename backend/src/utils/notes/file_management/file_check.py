@@ -1,7 +1,6 @@
-from backend.src.utils.constants import IMAGE, PDF_DOCUMENT, PPT_SLIDE, VIDEO, WORD_DOCUMENT
-
-
 import os
+
+from backend.src.utils.constants import IMAGE, PDF_DOCUMENT, PPT_SLIDE, VIDEO, WORD_DOCUMENT
 
 
 def check_file_type(file_path: str) -> str:
@@ -33,4 +32,3 @@ def check_file_type(file_path: str) -> str:
         return IMAGE
     else:
         raise ValueError("Unknown File Type")
-

@@ -1,6 +1,7 @@
-from pptx import Presentation
-import fitz
 import docx
+import fitz
+from pptx import Presentation
+
 from backend.src.utils.constants import PDF_DOCUMENT, PPT_SLIDE, WORD_DOCUMENT
 
 

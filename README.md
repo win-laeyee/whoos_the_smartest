@@ -3,6 +3,7 @@
 Whoots is a revolutionary app designed to transform the way students learn. By _simplifying_ complex study materials and _tailoring_ them to individual needs, Whoots aims to reduce stress and maximize understanding. Whether it's summarizing notes, generating quizzes, or providing targeted feedback, Whoots is here to make learning more efficient and enjoyable.
 
 [screenshots of app]
+[change readme accordingly after deployment]
 
 ## 🖥️ Run Frontend
 
@@ -28,20 +29,20 @@ Open [http://localhost:8000](http://localhost:8000) with your browser to see the
 
 ### 🔑 Setting Up Secrets
 1. Create a secrets folder:
-- Path: backend/secrets/
+- Path: `backend/secrets/`
 - Files to include:
-  - firebase_sdk.json
-  - firebase_service_account_key.json
-  - google_gemini_credentials.json
+  - `firebase_sdk.json`
+  - `firebase_service_account_key.json`
+  - `google_gemini_credentials.json`
 2. Obtain Keys:
-- Firebase SDK:
-  - Follow [this guide](https://firebase.google.com/docs/web/setup) to get the firebase_sdk.json.
-- Firebase Service Account Key:
-  - Follow [the guide](https://firebase.google.com/docs/admin/setup) here to download the firebase_service_account_key.json.
-- Google Gemini API Key:
-  - Get your API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+- **Firebase SDK**:
+  - Follow [this guide](https://firebase.google.com/docs/web/setup) to get the `firebase_sdk.json`.
+- **Firebase Service Account Key**:
+  - Follow [the guide](https://firebase.google.com/docs/admin/setup) here to download the `firebase_service_account_key.json`.
+- **Google Gemini API Key**:
+  - Get your API key from [Google AI Studio](https://aistudio.google.com/app/apikey) and put it in `google_gemini_credentials.json`.
 
-Make sure these files are placed correctly in the backend/secrets/ directory before running the backend.
+Make sure these files are placed correctly in the `backend/secrets/` directory before running the backend.
 
 
 ## 🚀 Features

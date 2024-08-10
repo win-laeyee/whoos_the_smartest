@@ -39,7 +39,6 @@ const Page: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         console.log("Login successful", result);
-        // Handle successful login
         handleNavigateUpload();
       } else {
         console.error("Login failed", response.statusText);

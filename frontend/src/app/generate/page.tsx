@@ -58,8 +58,6 @@ const Page: React.FC = () => {
       number_of_questions: +formData?.number_of_questions,
     });
 
-    console.log(formData);
-
     try {
       auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -77,7 +75,6 @@ const Page: React.FC = () => {
             }
           );
 
-          console.log(response);
           setIsLoading(false);
           if (response.ok) {
             const result = await response.json();

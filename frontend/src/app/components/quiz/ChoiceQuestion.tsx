@@ -87,9 +87,7 @@ const ChoiceQuestion: React.FC<QuestionProps> = ({
               body: JSON.stringify(data),
             }
           );
-          console.log(JSON.stringify(data));
 
-          console.log(response);
           setIsLoading(false);
           if (response.ok) {
             const result = await response.json();

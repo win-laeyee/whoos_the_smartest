@@ -58,7 +58,7 @@ const TextQuestion: React.FC<QuestionProps> = ({
             }
           );
           setIsLoading(false);
-          console.log(response);
+
           if (response.ok) {
             const result = await response.json();
             console.log("Quiz answer successful", result);

@@ -111,9 +111,7 @@ const Page: React.FC = () => {
               body: JSON.stringify(data),
             }
           );
-          console.log(JSON.stringify(data));
 
-          console.log(response);
           if (response.ok) {
             const result = await response.json();
             console.log("Regeneration of quiz successful", result);

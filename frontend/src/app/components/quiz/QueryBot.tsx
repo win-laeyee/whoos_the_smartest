@@ -43,9 +43,9 @@ const QueryBot: React.FC = () => {
             },
             body: JSON.stringify(data),
           });
-          console.log(JSON.stringify(data));
+
           setIsLoading(false);
-          console.log(response);
+
           if (response.ok) {
             const result = await response.json();
             console.log("Query successful", result);
@@ -90,11 +90,16 @@ const QueryBot: React.FC = () => {
       </button>
       <dialog id="query_modal" className="modal" ref={modalRef}>
         <div className="modal-box min-h-64">
-          <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-              ✕
-            </button>
-          </form>
+          <button
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            onClick={() => {
+              if (modalRef.current) {
+                modalRef.current.close();
+              }
+            }}
+          >
+            ✕
+          </button>
           <h3 className="font-bold text-lg">
             Hello! Feel free to ask any queries you have about your notes!
           </h3>

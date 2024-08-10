@@ -1,26 +1,25 @@
 "use client";
 
+import Image from "next/image";
+import FirebaseAuthUI from "./firebase";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
 
-  const handleNavigate = () => {
-    router.push("/upload");
+  const handleSignUp = () => {
+    router.push("/signup");
   };
-
   return (
     <main className="flex flex-col min-h-screen min-w-screen bg-primary justify-center items-center">
-      <div className="prose flex flex-col items-center text-center">
+      <div className="prose flex flex-col items-center text-center mb-5">
         <h1>Welcome to whoo</h1>
-        <p className="mb-5">
-          Upload your document and whoo will help you generate notes and take
-          care of the rest!
-        </p>
+        <Image src="/whoo_static.png" alt="whoo" width={150} height={150} />
       </div>
-      <button className="btn btn-secondary" onClick={handleNavigate}>
-        Click here to get started
-      </button>
+      <FirebaseAuthUI />
+      <a className="link link-neutral mt-2" onClick={handleSignUp}>
+        Click here to sign up
+      </a>
     </main>
   );
 }

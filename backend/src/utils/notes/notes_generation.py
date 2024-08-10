@@ -66,13 +66,14 @@ def get_notes_customisation_params(notes_customisation: NotesCustomisationReques
     }
 
 
-def generate_notes(model: GenerativeModel, file_path: str, notes_customisation: NotesCustomisationRequest) -> str:
+def generate_notes(model: GenerativeModel, file_path: str, file_name: str, notes_customisation: NotesCustomisationRequest) -> str:
     """
     Generates notes from a file based on its type. Handles media and document files.
 
     Args:
         model (GenerativeModel): The generative model to use for generating notes.
         file_path (str): The path to the file from which to generate notes.
+        file_name (str): Name of the file with extension
         notes_customisation (NotesCustomisationRequest): The customisation options.
 
     Returns:
@@ -85,7 +86,7 @@ def generate_notes(model: GenerativeModel, file_path: str, notes_customisation: 
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found at {file_path}")
 
-    file_type = check_file_type(file_path)
+    file_type = check_file_type(file_name)
 
     actual_customisation = get_notes_customisation_params(notes_customisation)
 

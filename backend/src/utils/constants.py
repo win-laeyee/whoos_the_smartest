@@ -13,9 +13,9 @@ QUIZ_COLLECTION = 'quiz_qn_and_ans'
 
 
 # Prompts
-QUIZ_FORMATTER = """Please return JSON describing the question and answer from this text using the following schema:
+QUIZ_FORMATTER = """Please return JSON list of questions and answers from this text using the following schema:
 
-    {"question_answer_list": list[MultipleChoice, MultiSelect, TrueFalse, FillInTheBlank, ShortAnswer, LongAnswer]}
+    list[MultipleChoice, MultiSelect, TrueFalse, FillInTheBlank, ShortAnswer, LongAnswer]
 
     MultipleChoice = {"question": str, "choices": list[str], "answer": int, "explanation": str}
     MultiSelect = {"question": str, "choices": list[str], "answer": list[int], "explanation": str}

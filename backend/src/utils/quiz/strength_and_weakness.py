@@ -104,7 +104,7 @@ def assess_student_strength_weakness(model: GenerativeModel, db: Client, user_id
     Raises:
         ValueError: If there are no recently answered quizzes or if the user did not answer any questions.
     """
-    quiz_docs = get_recent_documents(db, user_id, QUIZ_COLLECTION, minutes=num_of_quiz_qn*2)
+    quiz_docs = get_recent_documents(db, user_id, QUIZ_COLLECTION, minutes=120)
 
     if len(quiz_docs) == 0:
         raise ValueError(f"There is no recently answered quizzes. Answer a quiz before getting your score.")

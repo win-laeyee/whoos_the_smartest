@@ -3,12 +3,12 @@ import os
 from backend.src.utils.constants import IMAGE, PDF_DOCUMENT, PPT_SLIDE, VIDEO, WORD_DOCUMENT
 
 
-def check_file_type(file_path: str) -> str:
+def check_file_type(file_name: str) -> str:
     """
     Determines the type of the file based on its extension.
 
     Args:
-        file_path (str): The path to the file.
+        file_name (str): The name of the file.
 
     Returns:
         str: The file type as a string, such as 'PDF', 'WORD', 'IMAGE', 'VIDEO', or 'PRESENTATION_SLIDES'.
@@ -16,7 +16,7 @@ def check_file_type(file_path: str) -> str:
     Raises:
         ValueError: If the file type is unknown.
     """
-    _, ext = os.path.splitext(file_path)
+    _, ext = os.path.splitext(file_name)
 
     ext = ext.lower()
 

@@ -45,8 +45,7 @@ const Page: React.FC = () => {
           Array.isArray(quiz.questions_and_answers)
         ) {
           setQuiz(quiz.questions_and_answers);
-          // setTotalQuestion(quiz.questions_and_answers.length);
-          setTotalQuestion(1);
+          setTotalQuestion(quiz.questions_and_answers.length);
         } else {
           console.error(
             'Property "questions_and_answers" is missing or not an array.'

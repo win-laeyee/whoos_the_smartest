@@ -1,4 +1,3 @@
-import { Poppins } from "next/font/google";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -36,6 +35,23 @@ const config: Config = {
             },
           },
         },
+      },
+      animation: {
+        walk1: "walk1 1s steps(1) infinite",
+        walk2: "walk2 1s steps(1) infinite",
+      },
+      keyframes: {
+        walk1: {
+          "0%, 49.9%": { opacity: "1" }, // Show image 1
+          "50%, 100%": { opacity: "0" }, // Hide image 1
+        },
+        walk2: {
+          "0%, 49.9%": { opacity: "0" }, // Hide image 2
+          "50%, 100%": { opacity: "1" }, // Show image 2
+        },
+      },
+      width: {
+        "screen-minus-10": "calc(100vw - 40px)", // Adjust 10px to your desired margin
       },
     },
   },

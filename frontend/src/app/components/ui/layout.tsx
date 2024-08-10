@@ -36,9 +36,10 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
       <Image
         src="/whoo_static.png"
         alt="whoo"
-        width={50}
-        height={50}
-        className="ml-5"
+        width={40}
+        height={40}
+        className="ml-5 w-auto h-auto"
+        priority
       />
       <ul className="timeline flex  w-full">
         <li className="flex-auto">

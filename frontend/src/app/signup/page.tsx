@@ -58,7 +58,13 @@ const Page: React.FC = () => {
       <div className="prose flex flex-col items-center text-center">
         <h1>Welcome to whoo</h1>
 
-        <Image src="/whoo_static.png" alt="whoo" width={150} height={150} />
+        <Image
+          src="/whoo_static.png"
+          alt="whoo"
+          width={150}
+          height={150}
+          priority
+        />
         <form className="space-y-4" onSubmit={handleLogin}>
           <label className="input input-bordered flex items-center gap-2">
             <svg

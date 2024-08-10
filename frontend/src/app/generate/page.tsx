@@ -9,7 +9,6 @@ import { QuestionType } from "@/app/interfaces/type";
 import { auth } from "../firebase";
 import QuizForm from "../components/quiz/QuizForm";
 import OwlLoader from "../components/ui/OwlLoader";
-import QueryBot from "../components/quiz/QueryBot";
 
 const Page: React.FC = () => {
   const router = useRouter();

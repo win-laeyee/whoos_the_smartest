@@ -4,7 +4,15 @@ WORD_DOCUMENT = "WORD"
 IMAGE = "IMAGE"
 VIDEO = "VIDEO"
 PPT_SLIDE = "PRESENTATION_SLIDES"
-
+IMAGE_MIME_TYPES = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png"
+}
+VIDEO_MIME_TYPES = {
+    ".mp4": "video/mp4",
+    ".mov": "video/quicktime",
+}
 
 # Collection names
 USER_COLLECTION = 'users'

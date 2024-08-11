@@ -3,7 +3,6 @@ import { MouseEvent, useState } from "react";
 import { auth } from "../../firebase";
 import { QuestionProps } from "../../interfaces/props";
 import OwlLoader from "../ui/OwlLoader";
-import QueryBot from "./QueryBot";
 
 interface ColorChangingButtonProps {
   text: string;

@@ -4,6 +4,7 @@ import { signOut } from "firebase/auth";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import QueryBot from "../quiz/QueryBot";
 
 export default function Layout({ children }: { children?: React.ReactNode }) {
   const pathname = usePathname();
@@ -33,14 +34,7 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
 
   return (
     <div className="flex flex-row items-center">
-      <Image
-        src="/whoo_static.png"
-        alt="whoots"
-        width={40}
-        height={40}
-        className="ml-5 w-auto h-auto"
-        priority
-      />
+      <QueryBot />
       <ul className="timeline flex  w-full">
         <li className="flex-auto">
           <div

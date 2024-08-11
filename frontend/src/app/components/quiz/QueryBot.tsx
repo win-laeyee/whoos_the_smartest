@@ -4,6 +4,7 @@ import { auth } from "../../firebase";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import OwlLoader from "../ui/OwlLoader";
+import Image from "next/image";
 
 const QueryBot: React.FC = () => {
   const [question, setQuestion] = useState<string>("");
@@ -81,13 +82,26 @@ const QueryBot: React.FC = () => {
 
   return (
     <div>
-      <button
-        className="btn btn-neutral text-white"
-        type="button"
-        onClick={openModal}
-      >
-        Query bot
-      </button>
+      <div className="relative group inline-block">
+        <button
+          className="btn btn-neutral rounded-full p-2 w-16 h-16 flex items-center justify-center transition-transform transform group-hover:scale-110 ml-5"
+          type="button"
+          onClick={openModal}
+        >
+          <Image
+            src="/whoo_static.png"
+            alt="whoots"
+            width={40}
+            height={40}
+            className="rounded-full"
+            priority
+          />
+        </button>
+        <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-2 bg-black text-white text-xs rounded py-1 px-2 opacity-0 hover:opacity-100 transition-opacity duration-300">
+          Ask me anything
+        </div>
+      </div>
+
       <dialog id="query_modal" className="modal" ref={modalRef}>
         <div className="modal-box min-h-64">
           <button

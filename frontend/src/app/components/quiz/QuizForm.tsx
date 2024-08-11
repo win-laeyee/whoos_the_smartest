@@ -129,7 +129,6 @@ const QuizForm: React.FC<QuizFormProps> = ({
         <button className="btn btn-secondary" type="submit">
           {text}
         </button>
-        <QueryBot />
       </div>
     </form>
   );

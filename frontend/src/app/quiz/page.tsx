@@ -188,10 +188,10 @@ const Page: React.FC = () => {
           </svg>
           <div>Score: {evaluation.score}%</div>
 
-          <div className="p-5 bg-green-200 rounded-lg my-2">
+          <div className="p-5 bg-green-200 rounded-lg my-2 w-full">
             Strength: {evaluation.strength}
           </div>
-          <div className="p-5 bg-red-200 rounded-lg my-2">
+          <div className="p-5 bg-red-200 rounded-lg my-2 w-full">
             Weakness: {evaluation.weakness}
           </div>
           <QuizForm
@@ -227,7 +227,7 @@ const Page: React.FC = () => {
       )}
       {isLoading && (
         <div className="fixed inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 w-full h-full top-0 left-0">
-          <OwlLoader text="Simplifying the chaos." />
+          <OwlLoader text="Simplifying the chaos..." />
         </div>
       )}
     </div>

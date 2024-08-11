@@ -86,12 +86,12 @@ def generate_notes(model: GenerativeModel, file_path: str, file_name: str, notes
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found at {file_path}")
 
-    file_type = check_file_type(file_name)
+    file_type, ext = check_file_type(file_name)
 
     actual_customisation = get_notes_customisation_params(notes_customisation)
 
     if file_type in [VIDEO, IMAGE]:
-        file = upload_file(file_path, file_type)
+        file = upload_file(file_path, file_type, ext)
         notes = generate_notes_from_content(file, model, actual_customisation, content_type="media")
         cleanup_file(file)
     elif file_type in [PDF_DOCUMENT, WORD_DOCUMENT, PPT_SLIDE]:

@@ -21,14 +21,14 @@ def check_file_type(file_name: str) -> str:
     ext = ext.lower()
 
     if ext == '.pdf':
-        return PDF_DOCUMENT
-    elif ext == '.docx' or ext == ".doc":
-        return WORD_DOCUMENT
-    elif ext == '.pptx' or ext == '.ppt':
-        return PPT_SLIDE
-    elif ext == '.mp4' or ext == '.mov' or ext == '.avi':
-        return VIDEO
+        return PDF_DOCUMENT, ext
+    elif ext == '.docx':
+        return WORD_DOCUMENT, ext
+    elif ext == '.pptx':
+        return PPT_SLIDE, ext
+    elif ext == '.mp4' or ext == '.mov':
+        return VIDEO, ext
     elif ext == '.jpg' or ext == '.jpeg' or ext == '.png':
-        return IMAGE
+        return IMAGE, ext
     else:
         raise ValueError("Unknown File Type")

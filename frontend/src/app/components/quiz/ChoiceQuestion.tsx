@@ -160,7 +160,7 @@ const ChoiceQuestion: React.FC<QuestionProps> = ({
           </div>
         )}
         {isLoading && (
-          <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 overflow-auto">
+          <div className="fixed inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 overflow-auto">
             <OwlLoader />
           </div>
         )}

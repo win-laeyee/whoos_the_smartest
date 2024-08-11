@@ -114,7 +114,7 @@ const Page: React.FC = () => {
         Click here to log in
       </a>
       {isLoading && (
-        <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 overflow-auto">
+        <div className="fixed inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 w-full h-full top-0 left-0">
           <OwlLoader />
         </div>
       )}

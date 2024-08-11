@@ -16,6 +16,11 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the frontend.
 
+### 🔑 Setting Up Firebase
+1. Replace `firebase_example.tsx` with `firebase.tsx`
+   - Replace the firebaseConfig after setting up your Firebase SDK (refer to [🔑 Setting Up Secrets](https://github.com/win-laeyee/whoos_the_smartest/edit/main/README.md#-setting-up-secrets-1)) 
+
+
 ## 🔧 Run Backend
 
 ```bash

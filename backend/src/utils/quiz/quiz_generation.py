@@ -28,8 +28,6 @@ def check_and_format_question_answer_list(quiz_qn_and_ans_list: List[Dict[str, A
 
     valid_questions_and_answers = []
 
-    print(quiz_qn_and_ans_list)
-
     for qn_and_ans in quiz_qn_and_ans_list:
         if 'question' not in qn_and_ans or 'answer' not in qn_and_ans:
             raise ValueError(f"Missing 'question' or 'answer' key in: {qn_and_ans}")
@@ -138,13 +136,11 @@ def generate_quiz(model: GenerativeModel, db: Client, user_id: str, quiz_customi
 
     quiz_qn_and_ans = get_quiz_from_content(content, model, **quiz_customisation_params)
 
-    print(quiz_qn_and_ans)
-
     logging.info(f"Generated quizzes. Checking for format ...")
 
     quiz_qn_and_ans_dict = load_json_response(quiz_qn_and_ans)
 
-    return quiz_qn_and_ans_dict
+    return quiz_qn_and_ans_dict[:min(quiz_customisation_params["number_of_questions"], len(quiz_qn_and_ans_dict))]
 
 
 def format_strengths_weaknesses_for_quiz_regeneration(content: str, strengths_weaknesses: StudentQuizEvaluationResponse) -> str:

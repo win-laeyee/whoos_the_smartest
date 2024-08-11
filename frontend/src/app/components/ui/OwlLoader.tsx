@@ -2,7 +2,11 @@ import Image from "next/image";
 import owlImage1 from "../../../../public/whoo_walk_1.png";
 import owlImage2 from "../../../../public/whoo_walk_2.png";
 
-const OwlLoader: React.FC = () => {
+interface OwlLoaderProps {
+  text?: string;
+}
+
+const OwlLoader: React.FC<OwlLoaderProps> = ({ text }) => {
   return (
     <div className="flex flex-col justify-center items-center prose">
       <div className="relative w-48 h-48">
@@ -21,7 +25,7 @@ const OwlLoader: React.FC = () => {
           className="absolute inset-0 animate-walk2"
         />
       </div>
-      <h3 className="text-white">Loading...</h3>
+      <h3 className="text-white">{text}</h3>
     </div>
   );
 };

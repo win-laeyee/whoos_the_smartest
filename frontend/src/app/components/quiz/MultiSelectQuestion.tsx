@@ -157,7 +157,7 @@ const MultiSelectQuestion: React.FC<QuestionProps> = ({
 
             {isLoading && (
               <div className="fixed inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 w-full h-full top-0 left-0">
-                <OwlLoader />
+                <OwlLoader text="Taking the 'huh?' out of the equation..." />
               </div>
             )}
           </div>

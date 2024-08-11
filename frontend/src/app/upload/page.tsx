@@ -119,7 +119,7 @@ export default function Page() {
       />
       {isLoading && (
         <div className="fixed inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 w-full h-full top-0 left-0">
-          <OwlLoader />
+          <OwlLoader text="Turning hoots into insights..." />
         </div>
       )}
     </div>

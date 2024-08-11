@@ -1,6 +1,7 @@
 import Image from "next/image";
-import owlImage1 from "../../../../public/whoo_walk_1.png";
-import owlImage2 from "../../../../public/whoo_walk_2.png";
+import owlImage1 from "../../../public/whoo_walk_1.png";
+import owlImage2 from "../../../public/whoo_walk_2.png";
+
 
 interface OwlLoaderProps {
   text?: string;

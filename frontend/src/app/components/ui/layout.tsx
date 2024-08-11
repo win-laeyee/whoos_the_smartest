@@ -35,7 +35,7 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
     <div className="flex flex-row items-center">
       <Image
         src="/whoo_static.png"
-        alt="whoo"
+        alt="whoots"
         width={40}
         height={40}
         className="ml-5 w-auto h-auto"

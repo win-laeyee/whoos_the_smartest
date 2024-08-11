@@ -18,10 +18,10 @@ const Home = () => {
   return (
     <main className="flex flex-col min-h-screen min-w-screen bg-primary justify-center items-center">
       <div className="prose flex flex-col items-center text-center mb-5">
-        <h1>Welcome to whoo</h1>
+        <h1>Welcome to whoots</h1>
         <Image
           src="/whoo_static.png"
-          alt="whoo"
+          alt="whoots"
           width={150}
           height={150}
           priority

@@ -101,7 +101,10 @@ export default function Page() {
       <div className="card bg-base-100 p-5 mx-5 mt-5 border-black border-2">
         <div className="card-body">
           <h2 className="card-title">Drag and drop files here</h2>
-          <p>File type accepted: .mov, .mp4, .pdf, .pptx</p>
+          <p>
+            File type accepted: .mov, .mp4, .pdf, .pptx, .docx, .jpg, .jpeg,
+            .png,
+          </p>
           <input
             type="file"
             className="file-input border-black flex-grow file-input-secondary"

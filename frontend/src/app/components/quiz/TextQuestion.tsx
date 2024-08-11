@@ -113,7 +113,7 @@ const TextQuestion: React.FC<QuestionProps> = ({
             ) : (
               <button
                 className="btn btn-active btn-secondary mt-2"
-                onClick={handleNextQuestion}
+                onClick={handleComplete}
               >
                 Finish
               </button>

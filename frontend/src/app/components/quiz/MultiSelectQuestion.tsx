@@ -139,12 +139,21 @@ const MultiSelectQuestion: React.FC<QuestionProps> = ({
                 </div>
               )}
             {explanation && <div>Explanation: {explanation}</div>}
-            <button
-              className="btn btn-active btn-secondary mt-2"
-              onClick={handleNextQuestion}
-            >
-              Next
-            </button>
+            {index !== totalQuestion ? (
+              <button
+                className="btn btn-active btn-secondary mt-2 self-center"
+                onClick={handleNextQuestion}
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                className="btn btn-active btn-secondary mt-2"
+                onClick={handleComplete}
+              >
+                Finish
+              </button>
+            )}
 
             {isLoading && (
               <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 overflow-auto">

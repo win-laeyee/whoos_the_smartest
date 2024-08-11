@@ -151,6 +151,7 @@ const Page: React.FC = () => {
                 }
               );
               setIsLoading(false);
+              setNumQuestion(0);
               if (response.ok) {
                 const result = await response.json();
                 setEvaluation(result);

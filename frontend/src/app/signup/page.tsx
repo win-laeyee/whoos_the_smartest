@@ -35,7 +35,7 @@ const Page: React.FC = () => {
         },
         body: JSON.stringify(data),
       });
-
+      setIsLoading(false);
       if (response.ok) {
         const result = await response.json();
         console.log("Login successful", result);
@@ -47,8 +47,8 @@ const Page: React.FC = () => {
       }
     } catch (error) {
       console.error("Error:", error);
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -111,10 +111,10 @@ const Page: React.FC = () => {
       </div>
 
       <a className="link link-neutral mt-2" onClick={handleNavigateLogin}>
-        Click here to sign in
+        Click here to log in
       </a>
       {isLoading && (
-        <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 overflow-auto">
           <OwlLoader />
         </div>
       )}

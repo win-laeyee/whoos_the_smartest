@@ -53,11 +53,11 @@ const QueryBot: React.FC = () => {
           } else {
             console.error("Error:", response.statusText);
           }
-          setIsLoading(false);
         }
       });
     } catch (error) {
       console.error("Error:", error);
+      setIsLoading(false);
     }
   };
 
@@ -116,7 +116,7 @@ const QueryBot: React.FC = () => {
             </button>
           </div>
           {isLoading && (
-            <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50">
+            <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 overflow-auto">
               <OwlLoader />
             </div>
           )}

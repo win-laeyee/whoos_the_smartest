@@ -111,7 +111,7 @@ const Page: React.FC = () => {
               body: JSON.stringify(data),
             }
           );
-
+          setIsLoading(false);
           if (response.ok) {
             const result = await response.json();
             console.log("Regeneration of quiz successful", result);
@@ -125,8 +125,8 @@ const Page: React.FC = () => {
       });
     } catch (error) {
       console.error("Error:", error);
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -161,11 +161,11 @@ const Page: React.FC = () => {
           });
         } catch (error) {
           console.error("Error:", error);
+          setIsLoading(false);
         }
       };
 
       fetchEvaluation();
-      setIsLoading(false);
     }
   }, [complete, totalQuestion]);
 
@@ -226,7 +226,7 @@ const Page: React.FC = () => {
         </div>
       )}
       {isLoading && (
-        <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 overflow-auto">
           <OwlLoader />
         </div>
       )}

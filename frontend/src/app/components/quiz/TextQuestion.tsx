@@ -71,8 +71,8 @@ const TextQuestion: React.FC<QuestionProps> = ({
       });
     } catch (error) {
       console.error("Error:", error);
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -121,7 +121,7 @@ const TextQuestion: React.FC<QuestionProps> = ({
           </div>
         )}
         {isLoading && (
-          <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-opacity-50 bg-black flex items-center justify-center z-50 overflow-auto">
             <OwlLoader />
           </div>
         )}

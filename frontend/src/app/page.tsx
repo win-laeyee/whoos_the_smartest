@@ -29,7 +29,7 @@ const Home = () => {
       </div>
       <FirebaseAuthUISSR />
       <a className="link link-neutral mt-2" onClick={handleSignUp}>
-        Click here to sign up
+        Click here to register
       </a>
     </main>
   );

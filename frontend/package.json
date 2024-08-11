@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "firebase": "^10.12.5",
+    "firebaseui": "^6.1.0",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
     "react-markdown": "^9.0.1",
-    "remark-gfm": "^4.0.0"
+    "remark-gfm": "^4.0.0",
+    "ui": "^0.2.4"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",

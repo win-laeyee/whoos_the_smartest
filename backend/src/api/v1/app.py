@@ -1,6 +1,10 @@
 import logging
 
-from fastapi import FastAPI, Depends
+from tempfile import NamedTemporaryFile
+import os
+import json
+
+from fastapi import FastAPI, Depends, UploadFile, File, Form
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.exceptions import HTTPException
 
@@ -84,12 +88,20 @@ async def protected_route(user=Depends(verify_token)):
 
 @app.post("/api/get-notes-from-uploaded-file", response_model=NotesGenerateResponse)
 def get_notes_from_uploaded_file(
-    file: FilePathRequest,
-    notes_customisation: NotesCustomisationRequest,
+    file: UploadFile = File(...),
+    notes_customisation: str = Form(...),
     user=Depends(verify_token)
 ):
-    
-    notes = generate_notes(model, file.file_path, notes_customisation)
+    notes_customisation_dict = json.loads(notes_customisation)
+    notes_customisation_object = NotesCustomisationRequest(**notes_customisation_dict)
+
+    # file_dict
+    with NamedTemporaryFile(delete=False) as temp_file:
+        temp_file.write(file.file.read())
+        temp_file_path = temp_file.name
+
+    notes = generate_notes(model, temp_file_path, file.filename, notes_customisation_object)
+    os.remove(temp_file_path)
     user_id = user['uid']
     add_to_notes(db, user_id, notes)
 
@@ -103,10 +115,10 @@ def get_quiz_from_uploaded_notes(
 ):
     user_id = user['uid']
     
-    quiz_qn_and_ans_dict = generate_quiz(model, db, user_id, quiz_customisation)
-    formatted_quiz_qn_and_ans = check_and_format_question_answer_list(quiz_qn_and_ans_dict)
+    quiz_qn_and_ans_list = generate_quiz(model, db, user_id, quiz_customisation)
+    formatted_quiz_qn_and_ans = check_and_format_question_answer_list(quiz_qn_and_ans_list)
 
-    add_to_quizzes(db, user_id, quiz_qn_and_ans_dict)
+    add_to_quizzes(db, user_id, quiz_qn_and_ans_list)
 
     return QuizGenerateResponse(questions_and_answers=formatted_quiz_qn_and_ans)
 

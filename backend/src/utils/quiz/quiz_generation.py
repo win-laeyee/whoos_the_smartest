@@ -12,12 +12,12 @@ from backend.src.utils.firestore.notes_operations import retrieve_notes_doc_from
 from backend.src.utils.json_utils import load_json_response
 
 
-def check_and_format_question_answer_list(quiz_qn_and_ans_dict: Dict[str, List[Dict[str, Any]]]) -> List[Union[MultipleChoiceQuestion, MultiSelectQuestion, TrueFalseQuestion, FreeResponseQuestion]]:
+def check_and_format_question_answer_list(quiz_qn_and_ans_list: List[Dict[str, Any]]) -> List[Union[MultipleChoiceQuestion, MultiSelectQuestion, TrueFalseQuestion, FreeResponseQuestion]]:
     """
     Validates and formats a list of question and answer dictionaries.
 
     Args:
-        quiz_qn_and_ans_dict (Dict[str, List[Dict[str, Any]]]): The dictionary containing the list of questions and answers.
+        quiz_qn_and_ans_dict (List[Dict[str, Any]]): The dictionary containing the list of questions and answers.
 
     Returns:
         List[Union[MultipleChoiceQuestion, MultiSelectQuestion, TrueFalseQuestion, FreeResponseQuestion]]: A list of validated and formatted question objects.
@@ -25,10 +25,6 @@ def check_and_format_question_answer_list(quiz_qn_and_ans_dict: Dict[str, List[D
     Raises:
         ValueError: If the input dictionary is missing required keys.
     """
-    if 'question_answer_list' not in quiz_qn_and_ans_dict:
-            raise ValueError(f"Missing 'question_answer_list' key in: {quiz_qn_and_ans_dict}")
-
-    quiz_qn_and_ans_list = quiz_qn_and_ans_dict["question_answer_list"]
 
     valid_questions_and_answers = []
 
@@ -119,7 +115,7 @@ def get_quiz_from_content(content: str,
     return response.text
 
 
-def generate_quiz(model: GenerativeModel, db: Client, user_id: str, quiz_customisation: QuizCustomisationRequest) -> Dict[str, List[Dict[str, Any]]]:
+def generate_quiz(model: GenerativeModel, db: Client, user_id: str, quiz_customisation: QuizCustomisationRequest) -> List[Dict[str, Any]]:
     """
     Generates a quiz based on the user's notes and customization options.
 
@@ -130,7 +126,7 @@ def generate_quiz(model: GenerativeModel, db: Client, user_id: str, quiz_customi
         quiz_customisation (QuizCustomisationRequest): Customization options for generating the quiz.
 
     Returns:
-        Dict[str, List[Dict[str, Any]]]: The generated quiz in dictionary format.
+        List[Dict[str, Any]]: The generated quiz in dictionary format.
     """
 
     content = retrieve_notes_doc_from_firestore(db, user_id)
@@ -139,11 +135,12 @@ def generate_quiz(model: GenerativeModel, db: Client, user_id: str, quiz_customi
     quiz_customisation_params = get_quiz_customisation_params(quiz_customisation)
 
     quiz_qn_and_ans = get_quiz_from_content(content, model, **quiz_customisation_params)
+
     logging.info(f"Generated quizzes. Checking for format ...")
 
     quiz_qn_and_ans_dict = load_json_response(quiz_qn_and_ans)
 
-    return quiz_qn_and_ans_dict
+    return quiz_qn_and_ans_dict[:min(quiz_customisation_params["number_of_questions"], len(quiz_qn_and_ans_dict))]
 
 
 def format_strengths_weaknesses_for_quiz_regeneration(content: str, strengths_weaknesses: StudentQuizEvaluationResponse) -> str:

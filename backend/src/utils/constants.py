@@ -4,7 +4,15 @@ WORD_DOCUMENT = "WORD"
 IMAGE = "IMAGE"
 VIDEO = "VIDEO"
 PPT_SLIDE = "PRESENTATION_SLIDES"
-
+IMAGE_MIME_TYPES = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png"
+}
+VIDEO_MIME_TYPES = {
+    ".mp4": "video/mp4",
+    ".mov": "video/quicktime",
+}
 
 # Collection names
 USER_COLLECTION = 'users'
@@ -13,9 +21,9 @@ QUIZ_COLLECTION = 'quiz_qn_and_ans'
 
 
 # Prompts
-QUIZ_FORMATTER = """Please return JSON describing the question and answer from this text using the following schema:
+QUIZ_FORMATTER = """Please return JSON list of questions and answers from this text using the following schema:
 
-    {"question_answer_list": list[MultipleChoice, MultiSelect, TrueFalse, FillInTheBlank, ShortAnswer, LongAnswer]}
+    list[MultipleChoice, MultiSelect, TrueFalse, FillInTheBlank, ShortAnswer, LongAnswer]
 
     MultipleChoice = {"question": str, "choices": list[str], "answer": int, "explanation": str}
     MultiSelect = {"question": str, "choices": list[str], "answer": list[int], "explanation": str}

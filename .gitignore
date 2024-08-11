@@ -36,7 +36,7 @@ next-env.d.ts
 venv/
 
 # secrets
-backend/secrets/
+# backend/secrets/
 
 # pycache folders
 __pycache__/

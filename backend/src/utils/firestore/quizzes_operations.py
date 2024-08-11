@@ -8,19 +8,19 @@ from firebase_admin import firestore
 from backend.src.utils.constants import QUIZ_COLLECTION, USER_COLLECTION
 
 
-def add_to_quizzes(db: Client, user_id: str, quiz_qn_and_ans_dict: Dict[str, List[Dict[str, Any]]]) -> None:
+def add_to_quizzes(db: Client, user_id: str, quiz_qn_and_ans_list: List[Dict[str, Any]]) -> None:
     """
     Adds quiz questions and answers to the Firestore database.
 
     Args:
         db (Client): The Firestore client.
         user_id (str): The ID of the user.
-        quiz_qn_and_ans_dict (Dict[str, List[Dict[str, Any]]]): A dictionary containing quiz questions and answers under the key "question_answer_list".
+        quiz_qn_and_ans_dict (List[Dict[str, Any]]): A dictionary containing quiz questions and answers under the key "question_answer_list".
 
     Returns:
         None
     """
-    quizzes = quiz_qn_and_ans_dict["question_answer_list"]
+    quizzes = quiz_qn_and_ans_list
     logging.info(f"Uploading to firestore ...")
     for qna in quizzes:
         qna["timestamp"] = firestore.SERVER_TIMESTAMP

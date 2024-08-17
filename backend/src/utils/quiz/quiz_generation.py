@@ -242,4 +242,4 @@ def regenerate_quiz_based_on_evaluation(model: GenerativeModel,
 
     quiz_qn_and_ans_dict = load_json_response(quiz_qn_and_ans)
 
-    return quiz_qn_and_ans_dict
+    return quiz_qn_and_ans_dict[:min(quiz_customisation_params["number_of_questions"], len(quiz_qn_and_ans_dict))]

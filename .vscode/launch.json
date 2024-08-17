@@ -6,7 +6,8 @@
       "type": "python",
       "request": "launch",
       "module": "backend.run",
-      "justMyCode": false
+      "justMyCode": false,
+      "pythonPath": "${workspaceFolder}/myvenv/bin/python"
     }
   ]
 }

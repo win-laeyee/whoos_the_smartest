@@ -116,7 +116,7 @@ class QuizCustomisationRequest(BaseModel):
             "examples": [
                 {
                     "number_of_questions": 10,
-                    "question_types": ["multiple_choice", "true_false"],
+                    "question_types": ["multiple_choice", "multi_select", "true_false", "fill_in_the_blank", "short_answer", "long_answer"],
                     "difficulty_level": "medium",
                     "include_explanations": True,
                     "emphasis": "details",

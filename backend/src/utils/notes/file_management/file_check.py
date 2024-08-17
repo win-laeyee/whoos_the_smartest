@@ -31,4 +31,4 @@ def check_file_type(file_name: str) -> str:
     elif ext == '.jpg' or ext == '.jpeg' or ext == '.png':
         return IMAGE, ext
     else:
-        raise ValueError("Unknown File Type")
+        raise ValueError("Unsupported File Type")

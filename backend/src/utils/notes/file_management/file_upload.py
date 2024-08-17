@@ -66,7 +66,12 @@ def upload_video_file(video_path: str, ext: str) -> File:
 
     video_file_name = video_path
     logging.info(f"Uploading file...")
-    video_file = genai.upload_file(path=video_file_name, mime_type=mime_type)
+    try:
+        video_file = genai.upload_file(path=video_file_name, mime_type=mime_type)
+        logging.info(f"Completed upload: {video_file}")
+    except Exception as e:
+        logging.error(f"Video upload failed: {e}")
+        raise
     logging.info(f"Completed upload: {video_file}")
 
     while video_file.state.name == "PROCESSING":

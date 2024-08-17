@@ -39,18 +39,28 @@ const MultiSelectQuestion: React.FC<QuestionProps> = ({
   const [hasSubmit, setHasSubmit] = useState(false);
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const toggleSelect = (idx: number) => {
-    setSelectedIndices((prevSelectedIndices) =>
-      prevSelectedIndices.includes(idx)
-        ? prevSelectedIndices.filter((i) => i !== idx)
-        : [...prevSelectedIndices, idx]
-    );
+    if (!hasSubmit) {
+      setSelectedIndices((prevSelectedIndices) =>
+        prevSelectedIndices.includes(idx)
+          ? prevSelectedIndices.filter((i) => i !== idx)
+          : [...prevSelectedIndices, idx]
+      );
+      setError(""); // Clear error message when a choice is selected
+    }
   };
 
-  const handleSubmit = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     setIsLoading(true);
     e.preventDefault();
+
+    if (selectedIndices.length === 0) {
+      setError("Please select at least one option before submitting.");
+      setIsLoading(false);
+      return;
+    }
 
     const data = {
       question_and_answer: {
@@ -90,6 +100,7 @@ const MultiSelectQuestion: React.FC<QuestionProps> = ({
     } catch (error) {
       console.error("Error:", error);
       setIsLoading(false);
+      setError("Request failed.");
     }
   };
 
@@ -97,6 +108,7 @@ const MultiSelectQuestion: React.FC<QuestionProps> = ({
     setHasSubmit(false);
     setResult("");
     setSelectedIndices([]); // Clear selected indices for the next question
+    setError(""); // Clear error message on next question
     handleNext();
   };
 
@@ -116,6 +128,7 @@ const MultiSelectQuestion: React.FC<QuestionProps> = ({
           ))}
       </div>
       <div className="flex items-center justify-center">
+        {error && <p className="text-red-500">{error}</p>}
         {!hasSubmit ? (
           <button
             className="btn btn-active btn-secondary mt-2"

@@ -48,6 +48,13 @@ const QuizForm: React.FC<QuizFormProps> = ({
           name="number_of_questions"
           type="number"
           placeholder="10"
+          min="1"
+          onInput={(e) => {
+            const input = e.target as HTMLInputElement;
+            if (!input.validity.valid) {
+              input.value = "";
+            }
+          }}
           className="input input-bordered rounded-full border-black border-2 w-full mb-2"
           onChange={handleChange}
           value={formData.number_of_questions}

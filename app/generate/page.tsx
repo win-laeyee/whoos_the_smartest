@@ -38,6 +38,8 @@ const Page: React.FC = () => {
     });
   };
 
+  const [error, setError] = useState<string>("");
+
   const handleQuestionType = (val: QuestionType[]) => {
     setFormData({
       ...formData,
@@ -89,6 +91,7 @@ const Page: React.FC = () => {
     } catch (error) {
       console.error("Error:", error);
       setIsLoading(false);
+      setError("Request failed.");
     }
   };
 

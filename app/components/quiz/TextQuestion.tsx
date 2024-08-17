@@ -17,6 +17,7 @@ const TextQuestion: React.FC<QuestionProps> = ({
   const [hasSubmit, setHasSubmit] = useState(false);
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const handleNextQuestion = () => {
     setHasSubmit(false);
@@ -72,6 +73,7 @@ const TextQuestion: React.FC<QuestionProps> = ({
     } catch (error) {
       console.error("Error:", error);
       setIsLoading(false);
+      setError("Request failed.");
     }
   };
 

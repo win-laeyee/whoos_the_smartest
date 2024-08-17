@@ -90,6 +90,7 @@ export default function Page() {
       } catch (error) {
         console.error("Error:", error);
         setIsLoading(false);
+        setError("Request failed.");
       }
     }
   };

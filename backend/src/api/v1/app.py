@@ -92,20 +92,27 @@ def get_notes_from_uploaded_file(
     notes_customisation: str = Form(...),
     user=Depends(verify_token)
 ):
-    notes_customisation_dict = json.loads(notes_customisation)
-    notes_customisation_object = NotesCustomisationRequest(**notes_customisation_dict)
+    try:
+        notes_customisation_dict = json.loads(notes_customisation)
+        notes_customisation_object = NotesCustomisationRequest(**notes_customisation_dict)
 
-    # file_dict
-    with NamedTemporaryFile(delete=False) as temp_file:
-        temp_file.write(file.file.read())
-        temp_file_path = temp_file.name
+        with NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(file.file.read())
+            temp_file_path = temp_file.name
+            logging.info(f"Temp file created at: {temp_file_path}")
 
-    notes = generate_notes(model, temp_file_path, file.filename, notes_customisation_object)
-    os.remove(temp_file_path)
-    user_id = user['uid']
-    add_to_notes(db, user_id, notes)
+        notes = generate_notes(model, temp_file_path, file.filename, notes_customisation_object)
 
-    return NotesGenerateResponse(summarised_notes=notes)
+        os.remove(temp_file_path)
+        user_id = user['uid']
+        add_to_notes(db, user_id, notes)
+
+        return NotesGenerateResponse(summarised_notes=notes)
+
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.post("/api/get-quiz-from-uploaded-notes", response_model=QuizGenerateResponse)
@@ -113,12 +120,17 @@ def get_quiz_from_uploaded_notes(
     quiz_customisation: QuizCustomisationRequest,
     user=Depends(verify_token)
 ):
-    user_id = user['uid']
-    
-    quiz_qn_and_ans_list = generate_quiz(model, db, user_id, quiz_customisation)
-    formatted_quiz_qn_and_ans = check_and_format_question_answer_list(quiz_qn_and_ans_list)
+    try:
+        user_id = user['uid']
+        
+        quiz_qn_and_ans_list = generate_quiz(model, db, user_id, quiz_customisation)
+        formatted_quiz_qn_and_ans = check_and_format_question_answer_list(quiz_qn_and_ans_list)
 
-    add_to_quizzes(db, user_id, quiz_qn_and_ans_list)
+        add_to_quizzes(db, user_id, quiz_qn_and_ans_list)
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
     return QuizGenerateResponse(questions_and_answers=formatted_quiz_qn_and_ans)
 
@@ -128,13 +140,18 @@ def evaluate_student_answer(
     question_and_answers: CompareAnswerRequest,
     user=Depends(verify_token)
 ):
-    user_id = user['uid']
-    question_and_answer = question_and_answers.question_and_answer
-    student_answer = question_and_answers.student_answer
-    
-    correctness = check_student_answer(model, question_and_answer, student_answer)
+    try:
+        user_id = user['uid']
+        question_and_answer = question_and_answers.question_and_answer
+        student_answer = question_and_answers.student_answer
+        
+        correctness = check_student_answer(model, question_and_answer, student_answer)
 
-    add_student_answer_to_quizzes(db, user_id, question_and_answer.question, student_answer, correctness)
+        add_student_answer_to_quizzes(db, user_id, question_and_answer.question, student_answer, correctness)
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
     return EvaluateQuizResponse(correctness=correctness)
 
@@ -145,9 +162,14 @@ def get_student_strength_and_weakness(
     quiz_parameter: QuizParameterRequest,
     user=Depends(verify_token)
 ):
-    user_id = user['uid']
-    
-    result_dict = assess_student_strength_weakness(model, db, user_id, quiz_parameter.num_of_qns)
+    try:
+        user_id = user['uid']
+        
+        result_dict = assess_student_strength_weakness(model, db, user_id, quiz_parameter.num_of_qns)
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
     return StudentQuizEvaluationResponse(score=result_dict["score"],strength=result_dict["strength"], weakness=result_dict["weakness"])
 
@@ -158,12 +180,17 @@ def regenerate_quiz(
     strength_and_weakness: StudentQuizEvaluationResponse,
     user=Depends(verify_token)
 ):
-    user_id = user['uid']
-    
-    quiz_qn_and_ans_dict = regenerate_quiz_based_on_evaluation(model, db, user_id, quiz_customisation, strength_and_weakness)
-    formatted_quiz_qn_and_ans = check_and_format_question_answer_list(quiz_qn_and_ans_dict)
-    
-    add_to_quizzes(db, user_id, quiz_qn_and_ans_dict)
+    try:
+        user_id = user['uid']
+        
+        quiz_qn_and_ans_dict = regenerate_quiz_based_on_evaluation(model, db, user_id, quiz_customisation, strength_and_weakness)
+        formatted_quiz_qn_and_ans = check_and_format_question_answer_list(quiz_qn_and_ans_dict)
+        
+        add_to_quizzes(db, user_id, quiz_qn_and_ans_dict)
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
     return QuizGenerateResponse(questions_and_answers=formatted_quiz_qn_and_ans)
 
@@ -173,8 +200,13 @@ def query_bot(
     user_query: QueryBotRequest,
     user=Depends(verify_token)
 ):
-    user_id = user['uid']
-    bot_answer = query_firestore(db, user_id, model, user_query.query, limit=10)
+    try:
+        user_id = user['uid']
+        bot_answer = query_firestore(db, user_id, model, user_query.query, limit=10)
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
     return QueryBotResponse(answer=bot_answer)
 
@@ -183,8 +215,13 @@ def query_bot(
 def delete_media(
     file: DeleteMediaRequest
 ):
-    configure_genai()
-    genai.delete_file(file.file_name)
+    try:
+        configure_genai()
+        genai.delete_file(file.file_name)
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
     return DeleteMediaResponse(message="Video file deleted.")
 
@@ -193,11 +230,15 @@ def delete_collections(
     coll_info: DeleteCollectionsRequest,
     user=Depends(verify_token)
 ):
-    user_id = user['uid']
-    coll_name = coll_info.coll_name
-    batch_size = coll_info.batch_size
-    
-    delete_all_docs_in_collection(db, coll_name, batch_size, user_id)
+    try:
+        user_id = user['uid']
+        coll_name = coll_info.coll_name
+        batch_size = coll_info.batch_size
+        
+        delete_all_docs_in_collection(db, coll_name, batch_size, user_id)
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
     return DeleteCollectionsResponse(message=f"Deleted '{coll_name}' collection")
-

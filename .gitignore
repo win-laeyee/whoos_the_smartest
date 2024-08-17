@@ -34,6 +34,7 @@ next-env.d.ts
 
 # virtual env
 venv/
+myvenv/
 
 # secrets
 # backend/secrets/

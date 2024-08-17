@@ -13,6 +13,8 @@ const QueryBot: React.FC = () => {
 
   const modalRef = useRef<HTMLDialogElement>(null);
 
+  const [error, setError] = useState<string>("");
+
   const handleQuestion = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuestion(e.target.value);
   };
@@ -59,6 +61,7 @@ const QueryBot: React.FC = () => {
     } catch (error) {
       console.error("Error:", error);
       setIsLoading(false);
+      setError("Request failed.");
     }
   };
 

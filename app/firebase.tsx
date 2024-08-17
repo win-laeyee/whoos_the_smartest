@@ -19,13 +19,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const FirebaseAuthUI: React.FC = () => {
+const FirebaseAuthUI: React.FC<{ onLoginSuccess: () => void }> = ({
+  onLoginSuccess,
+}) => {
   const loadFirebaseui = useCallback(async () => {
     const firebaseui = await import("firebaseui");
     const firebaseUi =
       firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
     firebaseUi.start("#firebaseui-auth-container", {
-      signInSuccessUrl: "/upload",
       signInFlow: "popup",
       signInOptions: [
         {
@@ -35,13 +36,21 @@ const FirebaseAuthUI: React.FC = () => {
           provider: EmailAuthProvider.PROVIDER_ID,
         },
       ],
+      callbacks: {
+        signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+          if (onLoginSuccess) {
+            onLoginSuccess();
+          }
+          return false; // Prevent automatic redirect
+        },
+      },
       credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
     });
-  }, []);
+  }, [onLoginSuccess]);
 
   useEffect(() => {
     loadFirebaseui();
-  }, []);
+  }, [loadFirebaseui]);
 
   return <div id="firebaseui-auth-container"></div>;
 };

@@ -28,18 +28,21 @@ const Page: React.FC = () => {
     const data = { email, password };
 
     try {
-      const response = await fetch("http://0.0.0.0:8000/v1/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/v1/api/signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
       setIsLoading(false);
       if (response.ok) {
         const result = await response.json();
         console.log("Login successful", result);
-        handleNavigateUpload();
+        handleNavigateLogin();
       } else {
         console.error("Login failed", response.statusText);
         // Handle login failure

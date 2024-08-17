@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState, useEffect, MouseEvent } from "react";
 import { auth } from "../../firebase";
+import { HttpError } from "../../utils/errors";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import OwlLoader from "../ui/OwlLoader";
@@ -12,6 +13,8 @@ const QueryBot: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const modalRef = useRef<HTMLDialogElement>(null);
+
+  const [error, setError] = useState<string>("");
 
   const handleQuestion = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuestion(e.target.value);
@@ -34,31 +37,89 @@ const QueryBot: React.FC = () => {
     try {
       auth.onAuthStateChanged(async (user) => {
         if (user) {
-          const token = await user.getIdToken();
+          try {
+            const token = await user.getIdToken();
 
-          const response = await fetch("http://0.0.0.0:8000/v1/api/query-bot", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(data),
-          });
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/v1/api/query-bot`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(data),
+              }
+            );
 
-          setIsLoading(false);
+            setIsLoading(false);
 
-          if (response.ok) {
-            const result = await response.json();
-            console.log("Query successful", result);
-            setAnswer(result.answer);
-          } else {
-            console.error("Error:", response.statusText);
+            if (response.ok) {
+              const result = await response.json();
+              console.log("Query successful", result);
+              setAnswer(result.answer);
+            } else {
+              console.error("Error:", response.statusText, response.status);
+              throw new HttpError(response.statusText, response.status);
+            }
+          } catch (fetchError) {
+            setIsLoading(false);
+            console.error("Fetch error:", fetchError);
+
+            if (fetchError instanceof HttpError) {
+              switch (fetchError.status) {
+                case 400:
+                  setError("Bad request. Please check your input.");
+                  break;
+                case 401:
+                  setError("Unauthorized. Please log in.");
+                  break;
+                case 403:
+                  setError("Forbidden. You do not have access.");
+                  break;
+                case 404:
+                  setError(
+                    "Not found. The requested resource could not be found."
+                  );
+                  break;
+                case 413:
+                  setError("Request entity too large.");
+                  break;
+                case 422:
+                  setError(
+                    "Unprocessable entity. The request was well-formed but unable to be followed due to semantic errors."
+                  );
+                  break;
+                case 500:
+                  setError(
+                    "Internal server error. Please try again later. Gemini API resource limit may have been reached."
+                  );
+                  break;
+                case 504:
+                  setError(
+                    "Gateway timeout. The server took too long to respond."
+                  );
+                  break;
+                default:
+                  setError(
+                    "Generation failed. The request took too long to process. Please try again later. Note: The maximum duration allowed is 60 seconds."
+                  );
+                  break;
+              }
+            } else {
+              setError(
+                "An unexpected error occurred. The request took too long to process. Please try again later. Note: The maximum duration allowed is 60 seconds."
+              );
+            }
           }
+        } else {
+          setError("User is not authenticated.");
         }
       });
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (authError) {
       setIsLoading(false);
+      console.error("Authentication error:", authError);
+      setError("Authentication failed.");
     }
   };
 

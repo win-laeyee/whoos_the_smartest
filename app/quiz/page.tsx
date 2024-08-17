@@ -5,6 +5,7 @@ import Layout from "../components/ui/layout";
 import { auth } from "../firebase";
 import { Evaluation, QuizGenerationOptions } from "../interfaces/interface";
 import { QuestionType } from "../interfaces/type";
+import { HttpError } from "../utils/errors";
 import QuizForm from "../components/quiz/QuizForm";
 import Question from "../components/quiz/Question";
 import OwlLoader from "../components/ui/OwlLoader";
@@ -66,6 +67,8 @@ const Page: React.FC = () => {
     });
   };
 
+  const [error, setError] = useState<string>("");
+
   const handleNext = () => {
     if (quiz && numQuestions < quiz.length - 1) {
       setNumQuestion(numQuestions + 1);
@@ -98,34 +101,89 @@ const Page: React.FC = () => {
     try {
       auth.onAuthStateChanged(async (user) => {
         if (user) {
-          const token = await user.getIdToken();
+          try {
+            const token = await user.getIdToken();
 
-          const response = await fetch(
-            "http://0.0.0.0:8000/v1/api/regenerate-quiz",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify(data),
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/v1/api/regenerate-quiz`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(data),
+              }
+            );
+            setIsLoading(false);
+            if (response.ok) {
+              const result = await response.json();
+              console.log("Regeneration of quiz successful", result);
+              localStorage.setItem("quiz", JSON.stringify(result));
+              getQuiz();
+              setComplete(false);
+            } else {
+              console.error("Error:", response.statusText, response.status);
+              throw new HttpError(response.statusText, response.status);
             }
-          );
-          setIsLoading(false);
-          if (response.ok) {
-            const result = await response.json();
-            console.log("Regeneration of quiz successful", result);
-            localStorage.setItem("quiz", JSON.stringify(result));
-            getQuiz();
-            setComplete(false);
-          } else {
-            console.error("Error:", response.statusText);
+          } catch (fetchError) {
+            setIsLoading(false);
+            console.error("Fetch error:", fetchError);
+
+            if (fetchError instanceof HttpError) {
+              switch (fetchError.status) {
+                case 400:
+                  setError("Bad request. Please check your input.");
+                  break;
+                case 401:
+                  setError("Unauthorized. Please log in.");
+                  break;
+                case 403:
+                  setError("Forbidden. You do not have access.");
+                  break;
+                case 404:
+                  setError(
+                    "Not found. The requested resource could not be found."
+                  );
+                  break;
+                case 413:
+                  setError("Request entity too large.");
+                  break;
+                case 422:
+                  setError(
+                    "Unprocessable entity. The request was well-formed but unable to be followed due to semantic errors."
+                  );
+                  break;
+                case 500:
+                  setError(
+                    "Internal server error. Please try again later. Gemini API resource limit may have been reached."
+                  );
+                  break;
+                case 504:
+                  setError(
+                    "Gateway timeout. The server took too long to respond."
+                  );
+                  break;
+                default:
+                  setError(
+                    "Generation failed. The request took too long to process. Please try again later. Note: The maximum duration allowed is 60 seconds."
+                  );
+                  break;
+              }
+            } else {
+              setError(
+                "An unexpected error occurred. The request took too long to process. Please try again later. Note: The maximum duration allowed is 60 seconds."
+              );
+            }
           }
+        } else {
+          setError("User is not authenticated.");
         }
       });
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (authError) {
       setIsLoading(false);
+      console.error("Authentication error:", authError);
+      setError("Authentication failed.");
     }
   };
 
@@ -137,32 +195,87 @@ const Page: React.FC = () => {
         try {
           auth.onAuthStateChanged(async (user) => {
             if (user) {
-              const token = await user.getIdToken();
+              try {
+                const token = await user.getIdToken();
 
-              const response = await fetch(
-                "http://0.0.0.0:8000/v1/api/get-student-strength-weakness",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                  },
-                  body: JSON.stringify(data),
+                const response = await fetch(
+                  `${process.env.NEXT_PUBLIC_API_URL}/v1/api/get-student-strength-weakness`,
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(data),
+                  }
+                );
+                setIsLoading(false);
+                setNumQuestion(0);
+                if (response.ok) {
+                  const result = await response.json();
+                  setEvaluation(result);
+                } else {
+                  console.error("Error:", response.statusText, response.status);
+                  throw new HttpError(response.statusText, response.status);
                 }
-              );
-              setIsLoading(false);
-              setNumQuestion(0);
-              if (response.ok) {
-                const result = await response.json();
-                setEvaluation(result);
-              } else {
-                console.error("Error:", response.statusText);
+              } catch (fetchError) {
+                setIsLoading(false);
+                console.error("Fetch error:", fetchError);
+
+                if (fetchError instanceof HttpError) {
+                  switch (fetchError.status) {
+                    case 400:
+                      setError("Bad request. Please check your input.");
+                      break;
+                    case 401:
+                      setError("Unauthorized. Please log in.");
+                      break;
+                    case 403:
+                      setError("Forbidden. You do not have access.");
+                      break;
+                    case 404:
+                      setError(
+                        "Not found. The requested resource could not be found."
+                      );
+                      break;
+                    case 413:
+                      setError("Request entity too large.");
+                      break;
+                    case 422:
+                      setError(
+                        "Unprocessable entity. The request was well-formed but unable to be followed due to semantic errors."
+                      );
+                      break;
+                    case 500:
+                      setError(
+                        "Internal server error. Please try again later. Gemini API resource limit may have been reached."
+                      );
+                      break;
+                    case 504:
+                      setError(
+                        "Gateway timeout. The server took too long to respond."
+                      );
+                      break;
+                    default:
+                      setError(
+                        "Generation failed. The request took too long to process. Please try again later. Note: The maximum duration allowed is 60 seconds."
+                      );
+                      break;
+                  }
+                } else {
+                  setError(
+                    "An unexpected error occurred. The request took too long to process. Please try again later. Note: The maximum duration allowed is 60 seconds."
+                  );
+                }
               }
+            } else {
+              setError("User is not authenticated.");
             }
           });
-        } catch (error) {
-          console.error("Error:", error);
+        } catch (authError) {
           setIsLoading(false);
+          console.error("Authentication error:", authError);
+          setError("Authentication failed.");
         }
       };
 

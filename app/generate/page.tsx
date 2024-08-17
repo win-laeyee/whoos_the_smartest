@@ -6,6 +6,7 @@ import GeneratedText from "../components/generate/GeneratedText";
 import { useRouter } from "next/navigation";
 import { QuizGenerationOptions } from "@/app/interfaces/interface";
 import { QuestionType } from "@/app/interfaces/type";
+import { HttpError } from "../utils/errors";
 import { auth } from "../firebase";
 import QuizForm from "../components/quiz/QuizForm";
 import OwlLoader from "../components/ui/OwlLoader";
@@ -25,6 +26,7 @@ const Page: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log("Running useEffect to get markdown");
     getMarkdown();
   }, []);
 
@@ -32,13 +34,17 @@ const Page: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    console.log(`Form field ${name} changed to ${value}`);
     setFormData({
       ...formData,
       [name]: value,
     });
   };
 
+  const [error, setError] = useState<string>("");
+
   const handleQuestionType = (val: QuestionType[]) => {
+    console.log("Question types selected: ", val);
     setFormData({
       ...formData,
       question_types: val,
@@ -46,10 +52,12 @@ const Page: React.FC = () => {
   };
 
   const handleNavigate = () => {
+    console.log("Navigating to /quiz");
     router.push("/quiz");
   };
 
   const handleQuiz = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("Quiz form submitted with data:", formData);
     setIsLoading(true);
     e.preventDefault();
 
@@ -61,43 +69,100 @@ const Page: React.FC = () => {
     try {
       auth.onAuthStateChanged(async (user) => {
         if (user) {
-          const token = await user.getIdToken();
+          try {
+            const token = await user.getIdToken();
 
-          const response = await fetch(
-            "http://0.0.0.0:8000/v1/api/get-quiz-from-uploaded-notes",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify(formData),
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/v1/api/get-quiz-from-uploaded-notes`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(formData),
+              }
+            );
+
+            setIsLoading(false);
+            if (response.ok) {
+              const result = await response.json();
+              console.log("Quiz generation successful:", result);
+              localStorage.setItem("quiz", JSON.stringify(result));
+              handleNavigate();
+            } else {
+              console.error("Error:", response.statusText, response.status);
+              throw new HttpError(response.statusText, response.status);
             }
-          );
+          } catch (fetchError) {
+            setIsLoading(false);
+            console.error("Fetch error:", fetchError);
 
-          setIsLoading(false);
-          if (response.ok) {
-            const result = await response.json();
-            console.log("Quiz generation successful", result);
-            localStorage.setItem("quiz", JSON.stringify(result));
-            handleNavigate();
-          } else {
-            console.error("", response.statusText);
+            if (fetchError instanceof HttpError) {
+              switch (fetchError.status) {
+                case 400:
+                  setError("Bad request. Please check your input.");
+                  break;
+                case 401:
+                  setError("Unauthorized. Please log in.");
+                  break;
+                case 403:
+                  setError("Forbidden. You do not have access.");
+                  break;
+                case 404:
+                  setError(
+                    "Not found. The requested resource could not be found."
+                  );
+                  break;
+                case 413:
+                  setError("Request entity too large.");
+                  break;
+                case 422:
+                  setError(
+                    "Unprocessable entity. The request was well-formed but unable to be followed due to semantic errors."
+                  );
+                  break;
+                case 500:
+                  setError(
+                    "Internal server error. Please try again later. Gemini API resource limit may have been reached."
+                  );
+                  break;
+                case 504:
+                  setError(
+                    "Gateway timeout. The server took too long to respond."
+                  );
+                  break;
+                default:
+                  setError(
+                    "Generation failed. The request took too long to process. Please try again later. Note: The maximum duration allowed is 60 seconds."
+                  );
+                  break;
+              }
+            } else {
+              setError(
+                "An unexpected error occurred. The request took too long to process. Please try again later. Note: The maximum duration allowed is 60 seconds."
+              );
+            }
           }
+        } else {
+          setError("User is not authenticated.");
         }
       });
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (authError) {
       setIsLoading(false);
+      console.error("Authentication error:", authError);
+      setError("Authentication failed.");
     }
   };
 
   const getMarkdown = () => {
     const summary = localStorage.getItem("summary");
+    console.log("Retrieved summary from localStorage:", summary);
 
     if (summary) {
       try {
         const parsedSummary = JSON.parse(summary);
+        console.log("Parsed summary:", parsedSummary);
 
         if (parsedSummary && parsedSummary.summarised_notes) {
           setMarkDown(parsedSummary.summarised_notes);
@@ -118,6 +183,7 @@ const Page: React.FC = () => {
   };
 
   const downloadMarkdown = () => {
+    console.log("Downloading markdown content");
     // Create a Blob with the markdown content
     const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
 

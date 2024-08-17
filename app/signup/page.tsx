@@ -11,14 +11,11 @@ const Page: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const router = useRouter();
   const handleNavigateLogin = () => {
     router.push("/");
-  };
-
-  const handleNavigateUpload = () => {
-    router.push("/upload");
   };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -39,11 +36,10 @@ const Page: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         console.log("Login successful", result);
-        handleNavigateUpload();
+        setShowPopup(true);
       } else {
         console.error("Login failed", response.statusText);
-        // Handle login failure
-        setError("Login failed. Please check your email again.");
+        setError("Sign up failed. Please check your email and password.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -54,6 +50,27 @@ const Page: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen min-w-screen bg-primary justify-center items-center">
       {error && <ErrorModal errorMessage={error} />}
+      {showPopup && (
+        <div className="fixed inset-0 bg-opacity-60 bg-gray-800 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl text-center max-w-sm w-full">
+            <p className="text-lg font-semibold text-gray-800 mb-4">
+              Your account has been created successfully!
+            </p>
+            <p className="text-md text-gray-600">
+              You can now log in with your email.
+            </p>
+            <button
+              onClick={() => {
+                setShowPopup(false);
+                handleNavigateLogin();
+              }}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
       <div className="prose flex flex-col items-center text-center">
         <h1>Welcome to whoots</h1>
 

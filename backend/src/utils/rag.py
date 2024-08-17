@@ -1,5 +1,6 @@
 from typing import List, Optional
 import logging
+import re
 
 from firebase_admin import firestore
 
@@ -8,10 +9,10 @@ import google.generativeai as genai
 from google.cloud.firestore_v1.vector import Vector
 from google.cloud.firestore_v1.client import Client
 
-from langchain.schema import Document
-from langchain_experimental.text_splitter import SemanticChunker
+# from langchain.schema import Document
+# from langchain_experimental.text_splitter import SemanticChunker
 
-from backend.src.utils.app_init import configure_genai, init_embedding_model
+from backend.src.utils.app_init import configure_genai #, init_embedding_model
 from backend.src.utils.constants import NOTE_COLLECTION, USER_COLLECTION
 
 
@@ -85,19 +86,51 @@ def get_most_similar_text(db: Client, user_id: str, query: str, limit: Optional[
     return retrieved_text_lst
 
 
-def chunk_text(notes: str) -> List[Document]:
+# def chunk_text(notes: str) -> List[Document]:
+#     """
+#     Splits notes into smaller chunks using semantic text chunking.
+
+#     Args:
+#         notes (str): The notes to be chunked.
+
+#     Returns:
+#         List[Document]: A list of documents of chunked notes.
+#     """
+#     embedding_model = init_embedding_model()
+
+#     text_splitter = SemanticChunker(embedding_model, breakpoint_threshold_type="percentile")
+#     notes_split = text_splitter.create_documents([notes])
+
+#     return notes_split
+
+
+
+def chunk_text_by_sentence_count(notes: str, sentences_per_chunk: int) -> List[str]:
     """
-    Splits notes into smaller chunks using semantic text chunking.
+    Splits notes into smaller chunks based on the number of sentences.
 
     Args:
         notes (str): The notes to be chunked.
+        sentences_per_chunk (int): The number of sentences per chunk.
 
     Returns:
-        List[Document]: A list of documents of chunked notes.
+        List[str]: A list of text chunks.
     """
-    embedding_model = init_embedding_model()
+    sentence_endings = re.compile(r'(?<=[.!?]) +')
+    
+    sentences = sentence_endings.split(notes)
+    
+    chunks = []
+    current_chunk = []
 
-    text_splitter = SemanticChunker(embedding_model, breakpoint_threshold_type="percentile")
-    notes_split = text_splitter.create_documents([notes])
-
-    return notes_split
+    for sentence in sentences:
+        current_chunk.append(sentence.strip())
+        
+        if len(current_chunk) >= sentences_per_chunk:
+            chunks.append(" ".join(current_chunk))
+            current_chunk = []
+    
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+    
+    return chunks

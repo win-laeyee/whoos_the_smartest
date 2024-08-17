@@ -3,7 +3,7 @@ PDF_DOCUMENT = "PDF"
 WORD_DOCUMENT = "WORD"
 IMAGE = "IMAGE"
 VIDEO = "VIDEO"
-PPT_SLIDE = "PRESENTATION_SLIDES"
+# PPT_SLIDE = "PRESENTATION_SLIDES"
 IMAGE_MIME_TYPES = {
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",

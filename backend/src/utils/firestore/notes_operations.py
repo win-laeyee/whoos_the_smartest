@@ -4,7 +4,8 @@ import logging
 from firebase_admin import firestore
 from google.cloud.firestore_v1.client import Client
 
-from backend.src.utils.rag import chunk_text
+# from backend.src.utils.rag import chunk_text
+from backend.src.utils.rag import chunk_text_by_sentence_count
 from backend.src.utils.constants import NOTE_COLLECTION, USER_COLLECTION
 from backend.src.utils.firestore.document_operations import get_all_docs, get_recent_documents
 from backend.src.utils.rag import embed_text
@@ -20,10 +21,13 @@ def add_to_notes(db: Client, user_id: str, notes: str) -> None:
         user_id (str): The ID of the user.
         notes (str): The notes to be chunked and added.
     """
-    notes_split = chunk_text(notes)
+    # notes_split = chunk_text(notes)
+    notes_split = chunk_text_by_sentence_count(notes, 5)
+
     logging.info(f"Chunked notes into {len(notes_split)} chunks. Uploading to firestore ...")
     for note_doc in notes_split:
-        note = note_doc.page_content
+        # note = note_doc.page_content
+        note = note_doc
         if not note or not note.strip():
             continue
         note_embeddings = embed_text(note)

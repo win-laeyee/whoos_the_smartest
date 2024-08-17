@@ -6,7 +6,7 @@ from google.generativeai.types import File
 from google.generativeai import GenerativeModel
 
 from backend.src.api.v1.models.requests import NotesCustomisationRequest
-from backend.src.utils.constants import IMAGE, PDF_DOCUMENT, PPT_SLIDE, VIDEO, WORD_DOCUMENT
+from backend.src.utils.constants import IMAGE, PDF_DOCUMENT, VIDEO, WORD_DOCUMENT #,PPT_SLIDE
 from backend.src.utils.notes.file_management.file_check import check_file_type
 from backend.src.utils.notes.file_management.file_cleanup import cleanup_file
 from backend.src.utils.notes.file_management.file_upload import upload_file
@@ -94,7 +94,7 @@ def generate_notes(model: GenerativeModel, file_path: str, file_name: str, notes
         file = upload_file(file_path, file_type, ext)
         notes = generate_notes_from_content(file, model, actual_customisation, content_type="media")
         cleanup_file(file)
-    elif file_type in [PDF_DOCUMENT, WORD_DOCUMENT, PPT_SLIDE]:
+    elif file_type in [PDF_DOCUMENT, WORD_DOCUMENT]: #, PPT_SLIDE]:
         extracted_text = extract_text(file_path, file_type)
         notes = generate_notes_from_content(extracted_text, model, actual_customisation, content_type="document")
 

@@ -5,7 +5,7 @@ import os
 
 import google.generativeai as genai
 from google.generativeai import GenerativeModel
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+# from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 import firebase_admin
 from firebase_admin import credentials
@@ -33,13 +33,13 @@ def init_gemini_llm() -> GenerativeModel:
     return model
 
 
-def init_embedding_model() -> GoogleGenerativeAIEmbeddings:
-    """
-    Initializes and returns a GoogleGenerativeAIEmbeddings instance.
-    """
-    GOOGLE_API_KEY = configure_genai()
-    embedding_model = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=GOOGLE_API_KEY)
-    return embedding_model
+# def init_embedding_model() -> GoogleGenerativeAIEmbeddings:
+#     """
+#     Initializes and returns a GoogleGenerativeAIEmbeddings instance.
+#     """
+#     GOOGLE_API_KEY = configure_genai()
+#     embedding_model = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=GOOGLE_API_KEY)
+#     return embedding_model
 
 
 def configure_logging(log_level: int = logging.INFO) -> None:

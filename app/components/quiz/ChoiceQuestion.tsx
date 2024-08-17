@@ -40,22 +40,34 @@ const ChoiceQuestion: React.FC<QuestionProps> = ({
   const [hasSubmit, setHasSubmit] = useState(false);
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const handleNextQuestion = () => {
     setHasSubmit(false);
     setResult("");
     setSelectedIndex(null);
+    setError("");
     handleNext();
   };
 
   // Handle button click to set selected index
   const handleButtonClick = (index: number) => {
     setSelectedIndex(index);
+    if (!hasSubmit) {
+      setSelectedIndex(index);
+      setError("");
+    }
   };
 
-  const handleSubmit = (e: MouseEvent<HTMLButtonElement>) => {
-    setIsLoading(true);
+  const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+
+    if (selectedIndex === null) {
+      setError("Please select an option before submitting.");
+      setIsLoading(false);
+      return;
+    }
 
     const data = {
       question_and_answer: {
@@ -102,6 +114,7 @@ const ChoiceQuestion: React.FC<QuestionProps> = ({
     } catch (error) {
       console.error("Error:", error);
       setIsLoading(false);
+      setError("Request failed.");
     }
   };
 
@@ -121,6 +134,7 @@ const ChoiceQuestion: React.FC<QuestionProps> = ({
           ))}
       </div>
       <div className="flex items-center justify-center">
+        {error && <p className="text-red-500">{error}</p>}
         {!hasSubmit ? (
           <button
             className="btn btn-active btn-secondary mt-2"

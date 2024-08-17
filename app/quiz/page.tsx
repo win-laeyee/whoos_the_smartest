@@ -66,6 +66,8 @@ const Page: React.FC = () => {
     });
   };
 
+  const [error, setError] = useState<string>("");
+
   const handleNext = () => {
     if (quiz && numQuestions < quiz.length - 1) {
       setNumQuestion(numQuestions + 1);
@@ -126,6 +128,7 @@ const Page: React.FC = () => {
     } catch (error) {
       console.error("Error:", error);
       setIsLoading(false);
+      setError("Request failed.");
     }
   };
 
@@ -163,6 +166,7 @@ const Page: React.FC = () => {
         } catch (error) {
           console.error("Error:", error);
           setIsLoading(false);
+          setError("Request failed.");
         }
       };
 

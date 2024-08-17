@@ -2,7 +2,7 @@ import logging
 import time
 from typing import Any, Dict
 
-from moviepy.editor import VideoFileClip
+# from moviepy.editor import VideoFileClip
 
 import google.generativeai as genai
 from google.generativeai.types import File
@@ -10,31 +10,31 @@ from google.generativeai.types import File
 from backend.src.utils.constants import IMAGE, VIDEO, IMAGE_MIME_TYPES, VIDEO_MIME_TYPES
 
 
-def get_video_metadata(video_path: str) -> Dict[str, Any]:
-    """
-    Retrieves metadata from a video file.
+# def get_video_metadata(video_path: str) -> Dict[str, Any]:
+#     """
+#     Retrieves metadata from a video file.
 
-    Args:
-        video_path (str): The path to the video file.
+#     Args:
+#         video_path (str): The path to the video file.
 
-    Returns:
-        Dict[str, Any]: A dictionary containing video metadata such as duration, width, height, and fps.
+#     Returns:
+#         Dict[str, Any]: A dictionary containing video metadata such as duration, width, height, and fps.
 
-    Raises:
-        Exception: If an error occurs while processing the video file.
-    """
-    try:
-        clip = VideoFileClip(video_path)
-        video_metadata = {
-            'duration': clip.duration,
-            'width': clip.w,
-            'height': clip.h,
-            'fps': clip.fps
-        }
-        return video_metadata
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        return {}
+#     Raises:
+#         Exception: If an error occurs while processing the video file.
+#     """
+#     try:
+#         clip = VideoFileClip(video_path)
+#         video_metadata = {
+#             'duration': clip.duration,
+#             'width': clip.w,
+#             'height': clip.h,
+#             'fps': clip.fps
+#         }
+#         return video_metadata
+#     except Exception as e:
+#         logging.error(f"An error occurred: {e}")
+#         return {}
 
 
 def upload_video_file(video_path: str, ext: str) -> File:
@@ -57,17 +57,21 @@ def upload_video_file(video_path: str, ext: str) -> File:
         raise ValueError(f"Unsupported video file type: {ext}")
 
 
-    video_metadata = get_video_metadata(video_path)
-    logging.info(f"metadata: {video_metadata}")
+    # video_metadata = get_video_metadata(video_path)
+    # logging.info(f"metadata: {video_metadata}")
 
-    if video_metadata['duration'] >= 7200:
-        logging.info(f"Duration of the video is {video_metadata['duration']}")
-        raise ValueError("Video file is too long. Make sure it does not exceed 2 hours.")
+    # if video_metadata['duration'] >= 7200:
+    #     logging.info(f"Duration of the video is {video_metadata['duration']}")
+    #     raise ValueError("Video file is too long. Make sure it does not exceed 2 hours.")
 
     video_file_name = video_path
     logging.info(f"Uploading file...")
-    video_file = genai.upload_file(path=video_file_name, mime_type=mime_type)
-    logging.info(f"Completed upload: {video_file}")
+    try:
+        video_file = genai.upload_file(path=video_file_name, mime_type=mime_type)
+        logging.info(f"Completed upload: {video_file}")
+    except Exception as e:
+        logging.error(f"Video upload failed: {e}")
+        raise
 
     while video_file.state.name == "PROCESSING":
         print('.', end='')

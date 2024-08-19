@@ -2,16 +2,18 @@
 
 Whoots is a revolutionary app designed to transform the way students learn. By _simplifying_ complex study materials and _tailoring_ them to individual needs, Whoots aims to reduce stress and maximize understanding. Whether it's summarizing notes, generating quizzes, or providing targeted feedback, Whoots is here to make learning more efficient and enjoyable.
 
-## Live App
+## 🌐 Live App
 You can access Whoots deployed at this [link](https://whoos-the-smartest-frontend.vercel.app/).
 
 The FastAPI backend is deployed [here](https://whoos-the-smartest.vercel.app/).
 
-### Important Considerations:
+### ⚠️ Important Considerations:
 
 - **Vercel Limitations**: Vercel enforces a request size limit of 4.5 MB and a gateway timeout of 60 seconds. The backend serverless functions are also constrained by a 250 MB limit, which necessitated reducing the types of supported file extensions—.pptx files are not supported in the live app.
 - **Library Adjustments**: Some libraries, including Langchain and docx, were modified/ removed to accommodate these limitations.
-- **Gemini API Restrictions**: The Gemini API key is limited to 2 requests per minute and a total of 50 requests per day.
+- **Gemini API Restrictions**: The Gemini API key (free tier) is limited to 2 requests per minute and a total of 50 requests per day.
+
+If you'd like to avoid these restrictions, you can set up your own local environment by cloning the GitHub repository and following the instructions to [configure secrets](https://github.com/win-laeyee/whoos_the_smartest?tab=readme-ov-file#-setting-up-secrets) and run both the [frontend](https://github.com/win-laeyee/whoos_the_smartest?tab=readme-ov-file#%EF%B8%8F-run-frontend) and [backend](https://github.com/win-laeyee/whoos_the_smartest?tab=readme-ov-file#-run-backend).
 
 ## 🔑 Setting Up Secrets
 
